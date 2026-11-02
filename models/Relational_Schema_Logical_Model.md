@@ -221,12 +221,3 @@ Derived from the Conceptual and Logical models.
 - Message &nbsp; `varchar(500)`, not null
 - Primary key is (`Assessment_Number`, `Date_Notified`)
 
----
-
-### Design Notes
-
-1. **Subtype Hierarchies:** `USER` forms an overlapping base entity for `PATIENT`, `HEALTH_PROFESSIONAL`, and `ADMIN`. `HEALTH_PROFESSIONAL` uses a disjoint specialization for `DOCTOR` and `LAB_ASSISTANT`. All subtype tables inherit `SSN` as both primary key and foreign key reference.
-2. **Foreign Keys & Composite Keys:** Every FK pointing to a table with a composite primary key is a composite foreign key (e.g., `Room`, `Risk_Model`).
-3. **Patient Diagnosis Key Design:** `PATIENT_DIAGNOSIS` uses (`Patient_SSN`, `ICD_Code`) as its primary key, allowing one row per patient per condition; add `Diagnosis_Date` to the key if repeat diagnoses must be stored.
-4. **Risk Threshold Tiers:** Exactly three `Risk_Threshold` tiers per `Risk_Model` (`3:3`) and total participation of `USER` in the role subtypes need triggers or application logic.
-
