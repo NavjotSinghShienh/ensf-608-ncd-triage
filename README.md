@@ -157,7 +157,7 @@ In accordance with the ENSF 608 project continuity guidelines, the 15 preliminar
 
 ### Complete Relational Schema (25 Tables)
 
-Below is the complete relational schema mapped from the Conceptual EER Model. **Primary Keys (PK)** are bolded and underlined in the model; **Foreign Keys (FK)** are explicitly noted with their referenced target tables.
+Below is the complete relational schema mapped from the Conceptual EER Model. **Primary Keys (PK)** are underlined in the model; **Foreign Keys (FK)** are explicitly noted with their referenced target tables.
 
 #### A. Identity, Roles & Specialization Tables
 1. **`User`**
