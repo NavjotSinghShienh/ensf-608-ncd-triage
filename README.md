@@ -65,12 +65,13 @@ This database operationalizes **United Nations Sustainable Development Goal 3: G
 ```text
 ensf-608-ncd-triage/
 ├── models/
-│   ├── Conceptual_Model.drawio        # Editable Draw.io EER Conceptual Model
-│   ├── Conceptual_Model_Image.png     # Exported Conceptual Model diagram (PNG)
-│   ├── Logical_Model.drawio           # Editable Draw.io Relational Logical Model
-│   └── Logical_Model_Image.png        # Exported Logical Model schema diagram (PNG)
-├── scripts/                           # SQL DDL, DML, seed data, queries, and test scripts
-└── README.md                          # Project documentation
+│   ├── Conceptual_Model.drawio               # Editable Draw.io EER Conceptual Model
+│   ├── Conceptual_Model_Image.png            # Exported Conceptual Model diagram (PNG)
+│   ├── Logical_Model.drawio                  # Editable Draw.io Relational Logical Model
+│   ├── Logical_Model_Image.png               # Exported Logical Model schema diagram (PNG)
+│   └── Relational_Schema_Logical_Model.md    # Relational Schema with data types, domains & keys
+├── scripts/                                  # SQL DDL, DML, seed data, queries, and test scripts
+└── README.md                                 # Project documentation
 ```
 
 ---
@@ -152,135 +153,118 @@ In accordance with the ENSF 608 project continuity guidelines, the 15 preliminar
 
 - **Source File:** [`models/Logical_Model.drawio`](models/Logical_Model.drawio)
 - **Schema Image:** [`models/Logical_Model_Image.png`](models/Logical_Model_Image.png)
+- **Relational Schema & Data Types Document:** [`models/Relational_Schema_Logical_Model.md`](models/Relational_Schema_Logical_Model.md)
 
 ![Logical Database Model](models/Logical_Model_Image.png)
 
 ### Complete Relational Schema (25 Tables)
 
-Below is the complete relational schema mapped from the Conceptual EER Model. **Primary Keys (PK)** are underlined in the model; **Foreign Keys (FK)** are explicitly noted with their referenced target tables.
+Below is the complete relational schema mapped from the Conceptual EER Model. **Primary Keys (PK)** are underlined (`<u>...</u>`) and **Foreign Keys (FK)** are marked with `#` and explicitly noted with their referenced target tables.
 
 #### A. Identity, Roles & Specialization Tables
-1. **`User`**
-   - **PK:** `SSN`
-   - **Attributes:** `First_Name`, `Last_Name`, `DOB`, `Address`, `Email` (Unique), `Password`, `Phone_Number` (Unique), `Status`
-2. **`Patient`**
-   - **PK:** `SSN`
-   - **FK:** `SSN` $\rightarrow$ `User(SSN)`
-   - **Attributes:** `Healthcare_Number` (Unique), `Gender`, `Blood_Type`, `Status`
-3. **`Patient_Emergency_Contact`** *(Multivalued composite attribute relation)*
-   - **PK:** (`Patient_SSN`, `Contact_Name`, `Contact_Phone_Number`)
-   - **FK:** `Patient_SSN` $\rightarrow$ `Patient(SSN)`
-4. **`Admin`**
-   - **PK:** `SSN`
-   - **FKs:** `SSN` $\rightarrow$ `User(SSN)`, `Department_Name` $\rightarrow$ `Department(Department_Name)`
-   - **Attributes:** `Role`, `IsActive`
-5. **`Health_Professional`**
-   - **PK:** `SSN`
-   - **FKs:** `SSN` $\rightarrow$ `User(SSN)`, `Department_Name` $\rightarrow$ `Department(Department_Name)`
-   - **Attributes:** `Employee_Number` (Unique), `Employment_Date`, `Status`
-6. **`Doctor`**
-   - **PK:** `SSN`
-   - **FK:** `SSN` $\rightarrow$ `Health_Professional(SSN)`
-   - **Attributes:** `License_Number` (Unique), `Speciality`, `Qualification`
-7. **`Lab_Assistant`**
-   - **PK:** `SSN`
-   - **FK:** `SSN` $\rightarrow$ `Health_Professional(SSN)`
-   - **Attributes:** `Certification_Number` (Unique), `Certification_Type`, `Lab_Specialization`
+1. **`USER` (<u>SSN</u>, FIRST_NAME, LAST_NAME, DOB, ADDRESS, EMAIL, PASSWORD, PHONE_NUMBER, STATUS)**
+   - **PK:** <u>SSN</u>
+   - **Candidate Keys:** `Email` (Unique), `Phone_Number` (Unique)
+2. **`PATIENT` (<u>SSN#</u>, HEALTHCARE_NUMBER, GENDER, BLOOD_TYPE, STATUS)**
+   - **PK:** <u>SSN#</u>
+   - **FK:** `SSN#` $\rightarrow$ `USER(SSN)`
+   - **Candidate Key:** `Healthcare_Number` (Unique)
+3. **`PATIENT_EMERGENCY_CONTACT` (<u>PATIENT_SSN#</u>, <u>CONTACT_NAME</u>, <u>CONTACT_PHONE_NUMBER</u>)**
+   - **PK:** (<u>Patient_SSN#</u>, <u>Contact_Name</u>, <u>Contact_Phone_Number</u>)
+   - **FK:** `Patient_SSN#` $\rightarrow$ `PATIENT(SSN)`
+4. **`ADMIN` (<u>SSN#</u>, ROLE, ISACTIVE, DEPARTMENT_NAME#)**
+   - **PK:** <u>SSN#</u>
+   - **FKs:** `SSN#` $\rightarrow$ `USER(SSN)`, `Department_Name#` $\rightarrow$ `DEPARTMENT(Department_Name)`
+5. **`HEALTH_PROFESSIONAL` (<u>SSN#</u>, EMPLOYEE_NUMBER, EMPLOYMENT_DATE, STATUS, DEPARTMENT_NAME#)**
+   - **PK:** <u>SSN#</u>
+   - **FKs:** `SSN#` $\rightarrow$ `USER(SSN)`, `Department_Name#` $\rightarrow$ `DEPARTMENT(Department_Name)`
+   - **Candidate Key:** `Employee_Number` (Unique)
+6. **`DOCTOR` (<u>SSN#</u>, LICENSE_NUMBER, SPECIALITY, QUALIFICATION)**
+   - **PK:** <u>SSN#</u>
+   - **FK:** `SSN#` $\rightarrow$ `HEALTH_PROFESSIONAL(SSN)`
+   - **Candidate Key:** `License_Number` (Unique)
+7. **`LAB_ASSISTANT` (<u>SSN#</u>, CERTIFICATION_NUMBER, CERTIFICATION_TYPE, LAB_SPECIALIZATION)**
+   - **PK:** <u>SSN#</u>
+   - **FK:** `SSN#` $\rightarrow$ `HEALTH_PROFESSIONAL(SSN)`
+   - **Candidate Key:** `Certification_Number` (Unique)
 
 #### B. Healthcare Facility Infrastructure Tables
-8. **`Facility`**
-   - **PK:** `Facility_Name`
-   - **Attributes:** `Facility_Type`, `Address_Line1`, `Address_Line2`, `City`, `State`, `Country`
-9. **`Department`**
-   - **PK:** `Department_Name`
-   - **FK:** `Facility_Name` $\rightarrow$ `Facility(Facility_Name)`
-   - **Attributes:** `Location`
-10. **`Room`** *(Weak entity relation)*
-    - **PK:** (`Department_Name`, `Room_Number`)
-    - **FK:** `Department_Name` $\rightarrow$ `Department(Department_Name)`
-    - **Attributes:** `Room_Type`
+8. **`FACILITY` (<u>FACILITY_NAME</u>, FACILITY_TYPE, ADDRESS_LINE1, ADDRESS_LINE2, CITY, STATE, COUNTRY)**
+   - **PK:** <u>Facility_Name</u>
+9. **`DEPARTMENT` (<u>DEPARTMENT_NAME</u>, LOCATION, FACILITY_NAME#)**
+   - **PK:** <u>Department_Name</u>
+   - **FK:** `Facility_Name#` $\rightarrow$ `FACILITY(Facility_Name)`
+10. **`ROOM` (<u>DEPARTMENT_NAME#</u>, <u>ROOM_NUMBER</u>, ROOM_TYPE)**
+    - **PK:** (<u>Department_Name#</u>, <u>Room_Number</u>)
+    - **FK:** `Department_Name#` $\rightarrow$ `DEPARTMENT(Department_Name)`
 
 #### C. Clinical Appointments, Diagnostics & Care Plan Tables
-11. **`Appointment`**
-    - **PK:** `Appointment_Number`
+11. **`APPOINTMENT` (<u>APPOINTMENT_NUMBER</u>, APPOINTMENT_DATE, APPOINTMENT_TYPE, STATUS, PATIENT_SSN#, DOCTOR_SSN#, ADMIN_SSN#, DEPARTMENT_NAME#, ROOM_NUMBER#)**
+    - **PK:** <u>Appointment_Number</u>
     - **FKs:**
-      - `Patient_SSN` $\rightarrow$ `Patient(SSN)`
-      - `Doctor_SSN` $\rightarrow$ `Doctor(SSN)`
-      - `Admin_SSN` $\rightarrow$ `Admin(SSN)`
-      - (`Department_Name`, `Room_Number`) $\rightarrow$ `Room(Department_Name, Room_Number)`
-    - **Attributes:** `Appointment_Date`, `Appointment_Type`, `Status`
-12. **`Test_Type`**
-    - **PK:** `Test_Name`
-    - **FK:** `Admin_SSN` $\rightarrow$ `Admin(SSN)`
-    - **Attributes:** `Min_Range`, `Max_Range`
-13. **`Lab_Test`**
-    - **PK:** `Accession_Number`
+      - `Patient_SSN#` $\rightarrow$ `PATIENT(SSN)`
+      - `Doctor_SSN#` $\rightarrow$ `DOCTOR(SSN)`
+      - `Admin_SSN#` $\rightarrow$ `ADMIN(SSN)`
+      - (`Department_Name#`, `Room_Number#`) $\rightarrow$ `ROOM(Department_Name, Room_Number)`
+12. **`TEST_TYPE` (<u>TEST_NAME</u>, MIN_RANGE, MAX_RANGE, ADMIN_SSN#)**
+    - **PK:** <u>Test_Name</u>
+    - **FK:** `Admin_SSN#` $\rightarrow$ `ADMIN(SSN)`
+13. **`LAB_TEST` (<u>ACCESSION_NUMBER</u>, TEST_DATE, TEST_RESULT, STATUS, APPOINTMENT_NUMBER#, LAB_ASSISTANT_SSN#, TEST_NAME#)**
+    - **PK:** <u>Accession_Number</u>
     - **FKs:**
-      - `Appointment_Number` $\rightarrow$ `Appointment(Appointment_Number)`
-      - `Lab_Assistant_SSN` $\rightarrow$ `Lab_Assistant(SSN)`
-      - `Test_Name` $\rightarrow$ `Test_Type(Test_Name)`
-    - **Attributes:** `Test_Date`, `Test_Result`, `Status`
-14. **`Treatment_Type`**
-    - **PK:** `Treatment_Code`
-    - **Attributes:** `Treatment_Name`, `Treatment_Category`
-15. **`Appointment_Treatment`** *(M:N `Recommends` associative relation)*
-    - **PK:** (`Appointment_Number`, `Treatment_Code`)
+      - `Appointment_Number#` $\rightarrow$ `APPOINTMENT(Appointment_Number)`
+      - `Lab_Assistant_SSN#` $\rightarrow$ `LAB_ASSISTANT(SSN)`
+      - `Test_Name#` $\rightarrow$ `TEST_TYPE(Test_Name)`
+14. **`TREATMENT_TYPE` (<u>TREATMENT_CODE</u>, TREATMENT_NAME, TREATMENT_CATEGORY)**
+    - **PK:** <u>Treatment_Code</u>
+15. **`APPOINTMENT_TREATMENT` (<u>APPOINTMENT_NUMBER#</u>, <u>TREATMENT_CODE#</u>, TREATMENT_DATE, STATUS)**
+    - **PK:** (<u>Appointment_Number#</u>, <u>Treatment_Code#</u>)
     - **FKs:**
-      - `Appointment_Number` $\rightarrow$ `Appointment(Appointment_Number)`
-      - `Treatment_Code` $\rightarrow$ `Treatment_Type(Treatment_Code)`
-    - **Attributes:** `Treatment_Date`, `Status`
-16. **`Medication`**
-    - **PK:** `DIN`
-    - **Attributes:** `Generic_Name`, `Brand_Name`
-17. **`Appointment_Prescription`** *(M:N `Prescribes` associative relation)*
-    - **PK:** (`Appointment_Number`, `DIN`)
+      - `Appointment_Number#` $\rightarrow$ `APPOINTMENT(Appointment_Number)`
+      - `Treatment_Code#` $\rightarrow$ `TREATMENT_TYPE(Treatment_Code)`
+16. **`MEDICATION` (<u>DIN</u>, GENERIC_NAME, BRAND_NAME)**
+    - **PK:** <u>DIN</u>
+17. **`APPOINTMENT_PRESCRIPTION` (<u>APPOINTMENT_NUMBER#</u>, <u>DIN#</u>, DOSE, INSTRUCTION, STATUS)**
+    - **PK:** (<u>Appointment_Number#</u>, <u>DIN#</u>)
     - **FKs:**
-      - `Appointment_Number` $\rightarrow$ `Appointment(Appointment_Number)`
-      - `DIN` $\rightarrow$ `Medication(DIN)`
-    - **Attributes:** `Dose`, `Instruction`, `Status`
+      - `Appointment_Number#` $\rightarrow$ `APPOINTMENT(Appointment_Number)`
+      - `DIN#` $\rightarrow$ `MEDICATION(DIN)`
 
 #### D. Medical Conditions, Risk Models & Triage Alerting Tables
-18. **`Medical_Condition`**
-    - **PK:** `ICD_Code`
-    - **Attributes:** `Condition_Name` (Unique), `Category`
-19. **`Patient_Diagnosis`** *(M:N `Diagnosed With` associative relation)*
-    - **PK:** (`Patient_SSN`, `ICD_Code`)
+18. **`MEDICAL_CONDITION` (<u>ICD_CODE</u>, CONDITION_NAME, CATEGORY)**
+    - **PK:** <u>ICD_Code</u>
+    - **Candidate Key:** `Condition_Name` (Unique)
+19. **`PATIENT_DIAGNOSIS` (<u>PATIENT_SSN#</u>, <u>ICD_CODE#</u>, DIAGNOSIS_DATE, STATUS)**
+    - **PK:** (<u>Patient_SSN#</u>, <u>ICD_Code#</u>)
     - **FKs:**
-      - `Patient_SSN` $\rightarrow$ `Patient(SSN)`
-      - `ICD_Code` $\rightarrow$ `Medical_Condition(ICD_Code)`
-    - **Attributes:** `Diagnosis_Date`, `Status`
-20. **`Test_Threshold_Rule`** *(M:N `Indicates` associative relation)*
-    - **PK:** (`Test_Name`, `ICD_Code`)
+      - `Patient_SSN#` $\rightarrow$ `PATIENT(SSN)`
+      - `ICD_Code#` $\rightarrow$ `MEDICAL_CONDITION(ICD_Code)`
+20. **`TEST_THRESHOLD_RULE` (<u>TEST_NAME#</u>, <u>ICD_CODE#</u>, ABNORMALITY_THRESHOLD, OPERATOR)**
+    - **PK:** (<u>Test_Name#</u>, <u>ICD_Code#</u>)
     - **FKs:**
-      - `Test_Name` $\rightarrow$ `Test_Type(Test_Name)`
-      - `ICD_Code` $\rightarrow$ `Medical_Condition(ICD_Code)`
-    - **Attributes:** `Abnormality_Threshold`, `Operator`
-21. **`Risk_Model`**
-    - **PK:** (`NCD_Name`, `Effective_Date`)
-    - **FK:** `Admin_SSN` $\rightarrow$ `Admin(SSN)`
-    - **Attributes:** `Description`
-22. **`Risk_Threshold`** *(Weak entity relation)*
-    - **PK:** (`NCD_Name`, `Effective_Date`, `Risk_Tier`)
-    - **FK:** (`NCD_Name`, `Effective_Date`) $\rightarrow$ `Risk_Model(NCD_Name, Effective_Date)`
-    - **Attributes:** `Min_Score`, `Max_Score`
-23. **`Risk_Model_Evaluation`** *(M:N `Evaluates` associative relation)*
-    - **PK:** (`NCD_Name`, `Effective_Date`, `ICD_Code`)
+      - `Test_Name#` $\rightarrow$ `TEST_TYPE(Test_Name)`
+      - `ICD_Code#` $\rightarrow$ `MEDICAL_CONDITION(ICD_Code)`
+21. **`RISK_MODEL` (<u>NCD_NAME</u>, <u>EFFECTIVE_DATE</u>, DESCRIPTION, ADMIN_SSN#)**
+    - **PK:** (<u>NCD_Name</u>, <u>Effective_Date</u>)
+    - **FK:** `Admin_SSN#` $\rightarrow$ `ADMIN(SSN)`
+22. **`RISK_THRESHOLD` (<u>NCD_NAME#</u>, <u>EFFECTIVE_DATE#</u>, <u>RISK_TIER</u>, MIN_SCORE, MAX_SCORE)**
+    - **PK:** (<u>NCD_Name#</u>, <u>Effective_Date#</u>, <u>Risk_Tier</u>)
+    - **FK:** (`NCD_Name#`, `Effective_Date#`) $\rightarrow$ `RISK_MODEL(NCD_Name, Effective_Date)`
+23. **`RISK_MODEL_EVALUATION` (<u>NCD_NAME#</u>, <u>EFFECTIVE_DATE#</u>, <u>ICD_CODE#</u>, RISK_WEIGHT)**
+    - **PK:** (<u>NCD_Name#</u>, <u>Effective_Date#</u>, <u>ICD_Code#</u>)
     - **FKs:**
-      - (`NCD_Name`, `Effective_Date`) $\rightarrow$ `Risk_Model(NCD_Name, Effective_Date)`
-      - `ICD_Code` $\rightarrow$ `Medical_Condition(ICD_Code)`
-    - **Attributes:** `Risk_Weight`
-24. **`Risk_Assessment`**
-    - **PK:** `Assessment_Number`
+      - (`NCD_Name#`, `Effective_Date#`) $\rightarrow$ `RISK_MODEL(NCD_Name, Effective_Date)`
+      - `ICD_Code#` $\rightarrow$ `MEDICAL_CONDITION(ICD_Code)`
+24. **`RISK_ASSESSMENT` (<u>ASSESSMENT_NUMBER</u>, ASSESSMENT_DATE, SCORE, RISK_LEVEL, PATIENT_SSN#, NCD_NAME#, EFFECTIVE_DATE#)**
+    - **PK:** <u>Assessment_Number</u>
     - **FKs:**
-      - `Patient_SSN` $\rightarrow$ `Patient(SSN)`
-      - (`NCD_Name`, `Effective_Date`) $\rightarrow$ `Risk_Model(NCD_Name, Effective_Date)`
-    - **Attributes:** `Assessment_Date`, `Score`, `Risk_Level`
-25. **`Notification`** *(Weak entity relation)*
-    - **PK:** (`Assessment_Number`, `Date_Notified`)
+      - `Patient_SSN#` $\rightarrow$ `PATIENT(SSN)`
+      - (`NCD_Name#`, `Effective_Date#`) $\rightarrow$ `RISK_MODEL(NCD_Name, Effective_Date)`
+25. **`NOTIFICATION` (<u>ASSESSMENT_NUMBER#</u>, <u>DATE_NOTIFIED</u>, RECIPIENT_USER_SSN#, MESSAGE)**
+    - **PK:** (<u>Assessment_Number#</u>, <u>Date_Notified</u>)
     - **FKs:**
-      - `Assessment_Number` $\rightarrow$ `Risk_Assessment(Assessment_Number)`
-      - `Recipient_User_SSN` $\rightarrow$ `User(SSN)`
-    - **Attributes:** `Message`
+      - `Assessment_Number#` $\rightarrow$ `RISK_ASSESSMENT(Assessment_Number)`
+      - `Recipient_User_SSN#` $\rightarrow$ `USER(SSN)`
 
 ---
 
@@ -344,4 +328,3 @@ Per the **ENSF 608 Project Description**, the physical implementation and testin
 The database testing suite verifies:
 - **Structural & Constraint Integrity:** Primary key uniqueness, foreign key referential integrity (`ON DELETE` / `ON UPDATE` rules), `UNIQUE` constraints (`Healthcare_Number`, `Employee_Number`, `License_Number`, `Certification_Number`), `NOT NULL` enforcement, and domain `CHECK` constraints (e.g., valid status values and score ranges).
 - **Positive & Negative Test Cases:** Execution evidence demonstrating both valid clinical transactions and proper rejection of invalid or inconsistent data.
-

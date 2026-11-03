@@ -2,222 +2,220 @@
 
 **ENSF 608 - Group 6**
 
-**Notation** (follows the class ER Mapping example): each table header lists its attributes; `#` marks a foreign key (FK). Primary key columns are underlined in the attribute lines. Data types are standard MySQL-style defaults.
-
-Derived from the Conceptual and Logical models.
+**Notation:** Each relation header lists its schema in the format **RELATION (<u>PRIMARY_KEY</u>, ATTRIBUTE, FOREIGN_KEY#)** where primary key attributes are underlined and `#` marks a foreign key (FK). Each attribute line specifies its domain (`Data Type` and `Semantics / Integrity Constraints`).
 
 ---
 
-### A. User hierarchy
+### A. User Hierarchy
 
-**USER (SSN, FIRST_NAME, LAST_NAME, DOB, ADDRESS, EMAIL, PASSWORD, PHONE_NUMBER, STATUS)**
-- <u>SSN</u> &nbsp; `char(9)`, digits only
-- First_Name &nbsp; `varchar(50)`, not null
-- Last_Name &nbsp; `varchar(50)`, not null
-- DOB &nbsp; `date`, not null, must not be in the future (`Age` is derived from `DOB`, not stored)
-- Address &nbsp; `varchar(150)`
-- Email &nbsp; `varchar(100)`, unique, not null
-- Password &nbsp; `varchar(255)`, not null, stored as a hash
-- Phone_Number &nbsp; `varchar(15)`, unique
-- Status &nbsp; `varchar(20)`, not null, one of `Active` / `Inactive` / `Suspended`
+**USER (<u>SSN</u>, FIRST_NAME, LAST_NAME, DOB, ADDRESS, EMAIL, PASSWORD, PHONE_NUMBER, STATUS)**
+- <u>SSN</u> -> `char(9)`, not null, 9-digit Social Security Number (digits only)
+- First_Name -> `varchar(50)`, not null, user's legal given name
+- Last_Name -> `varchar(50)`, not null, user's legal family name
+- DOB -> `date`, not null, date of birth (must not be a future date)
+- Address -> `varchar(150)`, residential street address
+- Email -> `varchar(100)`, unique, not null, candidate key in valid email format
+- Password -> `varchar(255)`, not null, encrypted/hashed account password
+- Phone_Number -> `varchar(15)`, unique, candidate key in standard contact number format
+- Status -> `varchar(20)`, not null, account status: one of `Active` / `Inactive` / `Suspended`
 - Primary key is <u>SSN</u>
 
-**PATIENT (SSN#, HEALTHCARE_NUMBER, GENDER, BLOOD_TYPE, STATUS)**
-- <u>SSN#</u> &nbsp; `char(9)`, refers to `SSN` in the table `USER`
-- Healthcare_Number &nbsp; `varchar(20)`, unique, not null
-- Gender &nbsp; `varchar(20)`
-- Blood_Type &nbsp; `varchar(3)`, one of `A+`, `A-`, `B+`, `B-`, `AB+`, `AB-`, `O+`, `O-`
-- Status &nbsp; `varchar(20)`, not null, one of `Active` / `Inactive` / `Deceased`
+**PATIENT (<u>SSN#</u>, HEALTHCARE_NUMBER, GENDER, BLOOD_TYPE, STATUS)**
+- <u>SSN#</u> -> `char(9)`, not null, refers to `SSN` in table `USER`
+- Healthcare_Number -> `varchar(20)`, unique, not null, candidate key (provincial/national health card number)
+- Gender -> `varchar(20)`, patient gender identity
+- Blood_Type -> `varchar(3)`, ABO/Rh blood group: one of `A+`, `A-`, `B+`, `B-`, `AB+`, `AB-`, `O+`, `O-`
+- Status -> `varchar(20)`, not null, clinical status: one of `Active` / `Inactive` / `Deceased`
 - Primary key is <u>SSN#</u>
 
-**PATIENT_EMERGENCY_CONTACT (PATIENT_SSN#, CONTACT_NAME, CONTACT_PHONE_NUMBER)**
-- <u>Patient_SSN#</u> &nbsp; `char(9)`, refers to `SSN` in the table `PATIENT`
-- <u>Contact_Name</u> &nbsp; `varchar(100)`, not null
-- <u>Contact_Phone_Number</u> &nbsp; `varchar(15)`, not null
-- Primary key is (`Patient_SSN`, `Contact_Name`, `Contact_Phone_Number`)
+**PATIENT_EMERGENCY_CONTACT (<u>PATIENT_SSN#</u>, <u>CONTACT_NAME</u>, <u>CONTACT_PHONE_NUMBER</u>)**
+- <u>Patient_SSN#</u> -> `char(9)`, not null, part of composite primary key, refers to `SSN` in table `PATIENT`
+- <u>Contact_Name</u> -> `varchar(100)`, not null, part of composite primary key, full name of emergency contact person
+- <u>Contact_Phone_Number</u> -> `varchar(15)`, not null, part of composite primary key, telephone number of emergency contact
+- Primary key is (<u>Patient_SSN#</u>, <u>Contact_Name</u>, <u>Contact_Phone_Number</u>)
 
-**HEALTH_PROFESSIONAL (SSN#, EMPLOYEE_NUMBER, EMPLOYMENT_DATE, STATUS, DEPARTMENT_NAME#)**
-- <u>SSN#</u> &nbsp; `char(9)`, refers to `SSN` in the table `USER`
-- Employee_Number &nbsp; `varchar(20)`, unique, not null
-- Employment_Date &nbsp; `date`, not null
-- Status &nbsp; `varchar(20)`, not null, one of `Active` / `On Leave` / `Terminated`
-- Department_Name# &nbsp; `varchar(100)`, not null, refers to `Department_Name` in the table `DEPARTMENT`
+**HEALTH_PROFESSIONAL (<u>SSN#</u>, EMPLOYEE_NUMBER, EMPLOYMENT_DATE, STATUS, DEPARTMENT_NAME#)**
+- <u>SSN#</u> -> `char(9)`, not null, refers to `SSN` in table `USER`
+- Employee_Number -> `varchar(20)`, unique, not null, candidate key (staff identifier)
+- Employment_Date -> `date`, not null, date of hire
+- Status -> `varchar(20)`, not null, employment status: one of `Active` / `On Leave` / `Terminated`
+- Department_Name# -> `varchar(100)`, not null, refers to `Department_Name` in table `DEPARTMENT`
 - Primary key is <u>SSN#</u>
 
-**DOCTOR (SSN#, LICENSE_NUMBER, SPECIALITY, QUALIFICATION)**
-- <u>SSN#</u> &nbsp; `char(9)`, refers to `SSN` in the table `HEALTH_PROFESSIONAL`
-- License_Number &nbsp; `varchar(30)`, unique, not null
-- Speciality &nbsp; `varchar(100)`
-- Qualification &nbsp; `varchar(150)`
+**DOCTOR (<u>SSN#</u>, LICENSE_NUMBER, SPECIALITY, QUALIFICATION)**
+- <u>SSN#</u> -> `char(9)`, not null, refers to `SSN` in table `HEALTH_PROFESSIONAL`
+- License_Number -> `varchar(30)`, unique, not null, candidate key (medical license registration number)
+- Speciality -> `varchar(100)`, clinical area of specialization
+- Qualification -> `varchar(150)`, medical degrees and board certifications
 - Primary key is <u>SSN#</u>
 
-**LAB_ASSISTANT (SSN#, CERTIFICATION_NUMBER, CERTIFICATION_TYPE, LAB_SPECIALIZATION)**
-- <u>SSN#</u> &nbsp; `char(9)`, refers to `SSN` in the table `HEALTH_PROFESSIONAL`
-- Certification_Number &nbsp; `varchar(30)`, unique, not null
-- Certification_Type &nbsp; `varchar(100)`
-- Lab_Specialization &nbsp; `varchar(100)`
+**LAB_ASSISTANT (<u>SSN#</u>, CERTIFICATION_NUMBER, CERTIFICATION_TYPE, LAB_SPECIALIZATION)**
+- <u>SSN#</u> -> `char(9)`, not null, refers to `SSN` in table `HEALTH_PROFESSIONAL`
+- Certification_Number -> `varchar(30)`, unique, not null, candidate key (laboratory technician certification ID)
+- Certification_Type -> `varchar(100)`, category of laboratory certification
+- Lab_Specialization -> `varchar(100)`, specialized laboratory testing domain
 - Primary key is <u>SSN#</u>
 
-**ADMIN (SSN#, ROLE, ISACTIVE, DEPARTMENT_NAME#)**
-- <u>SSN#</u> &nbsp; `char(9)`, refers to `SSN` in the table `USER`
-- Role &nbsp; `varchar(50)`, not null
-- IsActive &nbsp; `boolean (tinyint(1))`, not null, default `true`
-- Department_Name# &nbsp; `varchar(100)`, not null, refers to `Department_Name` in the table `DEPARTMENT`
+**ADMIN (<u>SSN#</u>, ROLE, ISACTIVE, DEPARTMENT_NAME#)**
+- <u>SSN#</u> -> `char(9)`, not null, refers to `SSN` in table `USER`
+- Role -> `varchar(50)`, not null, administrative job role (e.g., `Receptionist`, `Security Admin`)
+- IsActive -> `boolean (tinyint(1))`, not null, default `true`, indicates whether administrative privileges are active
+- Department_Name# -> `varchar(100)`, not null, refers to `Department_Name` in table `DEPARTMENT`
 - Primary key is <u>SSN#</u>
 
 ---
 
 ### B. Organization
 
-**FACILITY (FACILITY_NAME, FACILITY_TYPE, ADDRESS_LINE1, ADDRESS_LINE2, CITY, STATE, COUNTRY)**
-- <u>Facility_Name</u> &nbsp; `varchar(100)`
-- Facility_Type &nbsp; `varchar(50)`, not null
-- Address_Line1 &nbsp; `varchar(100)`, not null
-- Address_Line2 &nbsp; `varchar(100)`
-- City &nbsp; `varchar(50)`, not null
-- State &nbsp; `varchar(50)`, not null (province or state)
-- Country &nbsp; `varchar(50)`, not null
+**FACILITY (<u>FACILITY_NAME</u>, FACILITY_TYPE, ADDRESS_LINE1, ADDRESS_LINE2, CITY, STATE, COUNTRY)**
+- <u>Facility_Name</u> -> `varchar(100)`, not null, unique official name of the healthcare institution
+- Facility_Type -> `varchar(50)`, not null, type of healthcare facility (e.g., `Hospital`, `Clinic`, `Diagnostic Center`)
+- Address_Line1 -> `varchar(100)`, not null, primary street address line
+- Address_Line2 -> `varchar(100)`, secondary address line (suite, building, or floor)
+- City -> `varchar(50)`, not null, city name
+- State -> `varchar(50)`, not null, province or state name
+- Country -> `varchar(50)`, not null, country name
 - Primary key is <u>Facility_Name</u>
 
-**DEPARTMENT (DEPARTMENT_NAME, LOCATION, FACILITY_NAME#)**
-- <u>Department_Name</u> &nbsp; `varchar(100)`
-- Location &nbsp; `varchar(100)`
-- Facility_Name# &nbsp; `varchar(100)`, not null, refers to `Facility_Name` in the table `FACILITY`
+**DEPARTMENT (<u>DEPARTMENT_NAME</u>, LOCATION, FACILITY_NAME#)**
+- <u>Department_Name</u> -> `varchar(100)`, not null, unique name of the hospital/clinic department
+- Location -> `varchar(100)`, physical wing or floor location within the facility
+- Facility_Name# -> `varchar(100)`, not null, refers to `Facility_Name` in table `FACILITY`
 - Primary key is <u>Department_Name</u>
 
-**ROOM (DEPARTMENT_NAME#, ROOM_NUMBER, ROOM_TYPE)**
-- <u>Department_Name#</u> &nbsp; `varchar(100)`, refers to `Department_Name` in the table `DEPARTMENT`
-- <u>Room_Number</u> &nbsp; `varchar(10)`, partial key of the weak entity
-- Room_Type &nbsp; `varchar(50)`
-- Primary key is (`Department_Name`, `Room_Number`)
+**ROOM (<u>DEPARTMENT_NAME#</u>, <u>ROOM_NUMBER</u>, ROOM_TYPE)**
+- <u>Department_Name#</u> -> `varchar(100)`, not null, part of composite primary key, refers to `Department_Name` in table `DEPARTMENT`
+- <u>Room_Number</u> -> `varchar(10)`, not null, part of composite primary key, room identifier within the department
+- Room_Type -> `varchar(50)`, functional classification of the room (e.g., `Consultation`, `Lab`, `Procedure`)
+- Primary key is (<u>Department_Name#</u>, <u>Room_Number</u>)
 
 ---
 
-### C. Appointments, treatment and medication
+### C. Appointments, Treatment and Medication
 
-**APPOINTMENT (APPOINTMENT_NUMBER, APPOINTMENT_DATE, APPOINTMENT_TYPE, STATUS, PATIENT_SSN#, DOCTOR_SSN#, ADMIN_SSN#, DEPARTMENT_NAME#, ROOM_NUMBER#)**
-- <u>Appointment_Number</u> &nbsp; `int`, auto increment
-- Appointment_Date &nbsp; `datetime`, not null
-- Appointment_Type &nbsp; `varchar(50)`, not null
-- Status &nbsp; `varchar(20)`, not null, one of `Scheduled` / `Completed` / `Cancelled` / `No-Show`
-- Patient_SSN# &nbsp; `char(9)`, not null, refers to `SSN` in the table `PATIENT`
-- Doctor_SSN# &nbsp; `char(9)`, not null, refers to `SSN` in the table `DOCTOR`
-- Admin_SSN# &nbsp; `char(9)`, not null, refers to `SSN` in the table `ADMIN`
-- Department_Name#, Room_Number# &nbsp; `varchar(100)`, `varchar(10)`, not null, together refer to (`Department_Name`, `Room_Number`) in the table `ROOM`
+**APPOINTMENT (<u>APPOINTMENT_NUMBER</u>, APPOINTMENT_DATE, APPOINTMENT_TYPE, STATUS, PATIENT_SSN#, DOCTOR_SSN#, ADMIN_SSN#, DEPARTMENT_NAME#, ROOM_NUMBER#)**
+- <u>Appointment_Number</u> -> `int`, auto increment, not null, unique appointment identifier
+- Appointment_Date -> `datetime`, not null, scheduled date and time of the appointment
+- Appointment_Type -> `varchar(50)`, not null, visit category (e.g., `Initial Consultation`, `Follow-Up`, `Routine Checkup`)
+- Status -> `varchar(20)`, not null, appointment state: one of `Scheduled` / `Completed` / `Cancelled` / `No-Show`
+- Patient_SSN# -> `char(9)`, not null, refers to `SSN` in table `PATIENT`
+- Doctor_SSN# -> `char(9)`, not null, refers to `SSN` in table `DOCTOR`
+- Admin_SSN# -> `char(9)`, not null, refers to `SSN` in table `ADMIN`
+- Department_Name# -> `varchar(100)`, not null, part of composite foreign key referring to (`Department_Name`, `Room_Number`) in table `ROOM`
+- Room_Number# -> `varchar(10)`, not null, part of composite foreign key referring to (`Department_Name`, `Room_Number`) in table `ROOM`
 - Primary key is <u>Appointment_Number</u>
 
-**TREATMENT_TYPE (TREATMENT_CODE, TREATMENT_NAME, TREATMENT_CATEGORY)**
-- <u>Treatment_Code</u> &nbsp; `varchar(20)`
-- Treatment_Name &nbsp; `varchar(100)`, not null
-- Treatment_Category &nbsp; `varchar(50)`
+**TREATMENT_TYPE (<u>TREATMENT_CODE</u>, TREATMENT_NAME, TREATMENT_CATEGORY)**
+- <u>Treatment_Code</u> -> `varchar(20)`, not null, standardized clinical procedure/therapy code
+- Treatment_Name -> `varchar(100)`, not null, descriptive name of the treatment or procedure
+- Treatment_Category -> `varchar(50)`, clinical classification (e.g., `Lifestyle Intervention`, `Surgical`, `Dialysis`, `Therapy`)
 - Primary key is <u>Treatment_Code</u>
 
-**APPOINTMENT_TREATMENT (APPOINTMENT_NUMBER#, TREATMENT_CODE#, TREATMENT_DATE, STATUS)**
-- <u>Appointment_Number#</u> &nbsp; `int`, refers to `Appointment_Number` in the table `APPOINTMENT`
-- <u>Treatment_Code#</u> &nbsp; `varchar(20)`, refers to `Treatment_Code` in the table `TREATMENT_TYPE`
-- Treatment_Date &nbsp; `date`, not null
-- Status &nbsp; `varchar(20)`, not null, one of `Recommended` / `In Progress` / `Completed` / `Cancelled`
-- Primary key is (`Appointment_Number`, `Treatment_Code`)
+**APPOINTMENT_TREATMENT (<u>APPOINTMENT_NUMBER#</u>, <u>TREATMENT_CODE#</u>, TREATMENT_DATE, STATUS)**
+- <u>Appointment_Number#</u> -> `int`, not null, part of composite primary key, refers to `Appointment_Number` in table `APPOINTMENT`
+- <u>Treatment_Code#</u> -> `varchar(20)`, not null, part of composite primary key, refers to `Treatment_Code` in table `TREATMENT_TYPE`
+- Treatment_Date -> `date`, not null, scheduled or administered date of the treatment
+- Status -> `varchar(20)`, not null, treatment progress state: one of `Recommended` / `In Progress` / `Completed` / `Cancelled`
+- Primary key is (<u>Appointment_Number#</u>, <u>Treatment_Code#</u>)
 
-**MEDICATION (DIN, GENERIC_NAME, BRAND_NAME)**
-- <u>DIN</u> &nbsp; `char(8)`, Canadian Drug Identification Number
-- Generic_Name &nbsp; `varchar(100)`, not null
-- Brand_Name &nbsp; `varchar(100)`
+**MEDICATION (<u>DIN</u>, GENERIC_NAME, BRAND_NAME)**
+- <u>DIN</u> -> `char(8)`, not null, 8-digit Canadian Drug Identification Number
+- Generic_Name -> `varchar(100)`, not null, standardized generic chemical name
+- Brand_Name -> `varchar(100)`, commercial/trade name of the medication
 - Primary key is <u>DIN</u>
 
-**APPOINTMENT_PRESCRIPTION (APPOINTMENT_NUMBER#, DIN#, DOSE, INSTRUCTION, STATUS)**
-- <u>Appointment_Number#</u> &nbsp; `int`, refers to `Appointment_Number` in the table `APPOINTMENT`
-- <u>DIN#</u> &nbsp; `char(8)`, refers to `DIN` in the table `MEDICATION`
-- Dose &nbsp; `varchar(50)`, not null
-- Instruction &nbsp; `varchar(255)`
-- Status &nbsp; `varchar(20)`, not null, one of `Active` / `Completed` / `Discontinued`
-- Primary key is (`Appointment_Number`, `DIN`)
+**APPOINTMENT_PRESCRIPTION (<u>APPOINTMENT_NUMBER#</u>, <u>DIN#</u>, DOSE, INSTRUCTION, STATUS)**
+- <u>Appointment_Number#</u> -> `int`, not null, part of composite primary key, refers to `Appointment_Number` in table `APPOINTMENT`
+- <u>DIN#</u> -> `char(8)`, not null, part of composite primary key, refers to `DIN` in table `MEDICATION`
+- Dose -> `varchar(50)`, not null, prescribed dosage strength and unit (e.g., `500 mg`, `10 mg`)
+- Instruction -> `varchar(255)`, administration frequency and clinical directions
+- Status -> `varchar(20)`, not null, prescription state: one of `Active` / `Completed` / `Discontinued`
+- Primary key is (<u>Appointment_Number#</u>, <u>DIN#</u>)
 
 ---
 
-### D. Lab testing
+### D. Lab Testing
 
-**TEST_TYPE (TEST_NAME, MIN_RANGE, MAX_RANGE, ADMIN_SSN#)**
-- <u>Test_Name</u> &nbsp; `varchar(100)`
-- Min_Range &nbsp; `decimal(10,2)`
-- Max_Range &nbsp; `decimal(10,2)`, must be ≥ `Min_Range`
-- Admin_SSN# &nbsp; `char(9)`, not null, refers to `SSN` in the table `ADMIN`
+**TEST_TYPE (<u>TEST_NAME</u>, MIN_RANGE, MAX_RANGE, ADMIN_SSN#)**
+- <u>Test_Name</u> -> `varchar(100)`, not null, standardized name of the laboratory test
+- Min_Range -> `decimal(10,2)`, lower bound of the normal physiological reference range
+- Max_Range -> `decimal(10,2)`, upper bound of the normal physiological reference range (must be ≥ `Min_Range`)
+- Admin_SSN# -> `char(9)`, not null, refers to `SSN` in table `ADMIN`
 - Primary key is <u>Test_Name</u>
 
-**LAB_TEST (ACCESSION_NUMBER, TEST_DATE, TEST_RESULT, STATUS, APPOINTMENT_NUMBER#, LAB_ASSISTANT_SSN#, TEST_NAME#)**
-- <u>Accession_Number</u> &nbsp; `varchar(20)`
-- Test_Date &nbsp; `date`, not null
-- Test_Result &nbsp; `decimal(10,2)`, null until the test is completed
-- Status &nbsp; `varchar(20)`, not null, one of `Ordered` / `In Progress` / `Completed` / `Cancelled`
-- Appointment_Number# &nbsp; `int`, not null, refers to `Appointment_Number` in the table `APPOINTMENT`
-- Lab_Assistant_SSN# &nbsp; `char(9)`, not null, refers to `SSN` in the table `LAB_ASSISTANT`
-- Test_Name# &nbsp; `varchar(100)`, not null, refers to `Test_Name` in the table `TEST_TYPE`
+**LAB_TEST (<u>ACCESSION_NUMBER</u>, TEST_DATE, TEST_RESULT, STATUS, APPOINTMENT_NUMBER#, LAB_ASSISTANT_SSN#, TEST_NAME#)**
+- <u>Accession_Number</u> -> `varchar(20)`, not null, unique laboratory specimen/order accession identifier
+- Test_Date -> `date`, not null, date the laboratory test was ordered or performed
+- Test_Result -> `decimal(10,2)`, quantitative empirical value returned from the lab test (nullable until test status is `Completed`)
+- Status -> `varchar(20)`, not null, lab test state: one of `Ordered` / `In Progress` / `Completed` / `Cancelled`
+- Appointment_Number# -> `int`, not null, refers to `Appointment_Number` in table `APPOINTMENT`
+- Lab_Assistant_SSN# -> `char(9)`, not null, refers to `SSN` in table `LAB_ASSISTANT`
+- Test_Name# -> `varchar(100)`, not null, refers to `Test_Name` in table `TEST_TYPE`
 - Primary key is <u>Accession_Number</u>
 
 ---
 
-### E. Clinical conditions
+### E. Clinical Conditions
 
-**MEDICAL_CONDITION (ICD_CODE, CONDITION_NAME, CATEGORY)**
-- <u>ICD_Code</u> &nbsp; `varchar(10)`
-- Condition_Name &nbsp; `varchar(150)`, unique, not null
-- Category &nbsp; `varchar(50)`
+**MEDICAL_CONDITION (<u>ICD_CODE</u>, CONDITION_NAME, CATEGORY)**
+- <u>ICD_Code</u> -> `varchar(10)`, not null, standardized International Classification of Diseases (ICD) code
+- Condition_Name -> `varchar(150)`, unique, not null, candidate key (clinical name of the medical condition or risk factor)
+- Category -> `varchar(50)`, condition classification (e.g., `Cardiovascular`, `Metabolic`, `Respiratory`, `Lifestyle`)
 - Primary key is <u>ICD_Code</u>
 
-**PATIENT_DIAGNOSIS (PATIENT_SSN#, ICD_CODE#, DIAGNOSIS_DATE, STATUS)**
-- <u>Patient_SSN#</u> &nbsp; `char(9)`, refers to `SSN` in the table `PATIENT`
-- <u>ICD_Code#</u> &nbsp; `varchar(10)`, refers to `ICD_Code` in the table `MEDICAL_CONDITION`
-- Diagnosis_Date &nbsp; `date`, not null
-- Status &nbsp; `varchar(20)`, not null, one of `Active` / `Resolved` / `Chronic`
-- Primary key is (`Patient_SSN`, `ICD_Code`)
+**PATIENT_DIAGNOSIS (<u>PATIENT_SSN#</u>, <u>ICD_CODE#</u>, DIAGNOSIS_DATE, STATUS)**
+- <u>Patient_SSN#</u> -> `char(9)`, not null, part of composite primary key, refers to `SSN` in table `PATIENT`
+- <u>ICD_Code#</u> -> `varchar(10)`, not null, part of composite primary key, refers to `ICD_Code` in table `MEDICAL_CONDITION`
+- Diagnosis_Date -> `date`, not null, date the condition was clinically diagnosed
+- Status -> `varchar(20)`, not null, clinical diagnosis state: one of `Active` / `Resolved` / `Chronic`
+- Primary key is (<u>Patient_SSN#</u>, <u>ICD_Code#</u>)
 
-**TEST_THRESHOLD_RULE (TEST_NAME#, ICD_CODE#, ABNORMALITY_THRESHOLD, OPERATOR)**
-- <u>Test_Name#</u> &nbsp; `varchar(100)`, refers to `Test_Name` in the table `TEST_TYPE`
-- <u>ICD_Code#</u> &nbsp; `varchar(10)`, refers to `ICD_Code` in the table `MEDICAL_CONDITION`
-- Abnormality_Threshold &nbsp; `decimal(10,2)`, not null
-- Operator &nbsp; `varchar(2)`, not null, one of `<`, `<=`, `>`, `>=`, `=`
-- Primary key is (`Test_Name`, `ICD_Code`)
+**TEST_THRESHOLD_RULE (<u>TEST_NAME#</u>, <u>ICD_CODE#</u>, ABNORMALITY_THRESHOLD, OPERATOR)**
+- <u>Test_Name#</u> -> `varchar(100)`, not null, part of composite primary key, refers to `Test_Name` in table `TEST_TYPE`
+- <u>ICD_Code#</u> -> `varchar(10)`, not null, part of composite primary key, refers to `ICD_Code` in table `MEDICAL_CONDITION`
+- Abnormality_Threshold -> `decimal(10,2)`, not null, numerical cutoff value indicating clinical abnormality
+- Operator -> `varchar(2)`, not null, comparison operator used against `Abnormality_Threshold`: one of `<`, `<=`, `>`, `>=`, `=`
+- Primary key is (<u>Test_Name#</u>, <u>ICD_Code#</u>)
 
 ---
 
-### F. Risk modelling
+### F. Risk Modelling
 
-**RISK_MODEL (NCD_NAME, EFFECTIVE_DATE, DESCRIPTION, ADMIN_SSN#)**
-- <u>NCD_Name</u> &nbsp; `varchar(100)`, part of primary key
-- <u>Effective_Date</u> &nbsp; `date`, part of primary key
-- Description &nbsp; `varchar(255)`
-- Admin_SSN# &nbsp; `char(9)`, not null, refers to `SSN` in the table `ADMIN`
-- Primary key is (`NCD_Name`, `Effective_Date`)
+**RISK_MODEL (<u>NCD_NAME</u>, <u>EFFECTIVE_DATE</u>, DESCRIPTION, ADMIN_SSN#)**
+- <u>NCD_Name</u> -> `varchar(100)`, not null, part of composite primary key, target Non-Communicable Disease name
+- <u>Effective_Date</u> -> `date`, not null, part of composite primary key, version effective date of the risk model
+- Description -> `varchar(255)`, summary of clinical guidelines and scoring methodology
+- Admin_SSN# -> `char(9)`, not null, refers to `SSN` in table `ADMIN`
+- Primary key is (<u>NCD_Name</u>, <u>Effective_Date</u>)
 
-**RISK_THRESHOLD (NCD_NAME#, EFFECTIVE_DATE#, RISK_TIER, MIN_SCORE, MAX_SCORE)**
-- <u>NCD_Name#</u> &nbsp; `varchar(100)`, refers to `NCD_Name` in the table `RISK_MODEL`
-- <u>Effective_Date#</u> &nbsp; `date`, refers to `Effective_Date` in the table `RISK_MODEL`
-- <u>Risk_Tier</u> &nbsp; `varchar(10)`, partial key, one of `Low` / `Medium` / `High`
-- Min_Score &nbsp; `decimal(5,2)`, must be ≥ 0
-- Max_Score &nbsp; `decimal(5,2)`, must be ≥ `Min_Score`
-- Primary key is (`NCD_Name`, `Effective_Date`, `Risk_Tier`)
+**RISK_THRESHOLD (<u>NCD_NAME#</u>, <u>EFFECTIVE_DATE#</u>, <u>RISK_TIER</u>, MIN_SCORE, MAX_SCORE)**
+- <u>NCD_Name#</u> -> `varchar(100)`, not null, part of composite primary key, part of composite foreign key referring to (`NCD_Name`, `Effective_Date`) in table `RISK_MODEL`
+- <u>Effective_Date#</u> -> `date`, not null, part of composite primary key, part of composite foreign key referring to (`NCD_Name`, `Effective_Date`) in table `RISK_MODEL`
+- <u>Risk_Tier</u> -> `varchar(10)`, not null, part of composite primary key, clinical triage tier: one of `Low` / `Medium` / `High`
+- Min_Score -> `decimal(5,2)`, not null, minimum score bound for the tier (must be ≥ 0)
+- Max_Score -> `decimal(5,2)`, not null, maximum score bound for the tier (must be ≥ `Min_Score`)
+- Primary key is (<u>NCD_Name#</u>, <u>Effective_Date#</u>, <u>Risk_Tier</u>)
 
-**RISK_MODEL_EVALUATION (NCD_NAME#, EFFECTIVE_DATE#, ICD_CODE#, RISK_WEIGHT)**
-- <u>NCD_Name#</u> &nbsp; `varchar(100)`, refers to `NCD_Name` in the table `RISK_MODEL`
-- <u>Effective_Date#</u> &nbsp; `date`, refers to `Effective_Date` in the table `RISK_MODEL`
-- <u>ICD_Code#</u> &nbsp; `varchar(10)`, refers to `ICD_Code` in the table `MEDICAL_CONDITION`
-- Risk_Weight &nbsp; `decimal(5,2)`, not null, must be ≥ 0
-- Primary key is (`NCD_Name`, `Effective_Date`, `ICD_Code`)
+**RISK_MODEL_EVALUATION (<u>NCD_NAME#</u>, <u>EFFECTIVE_DATE#</u>, <u>ICD_CODE#</u>, RISK_WEIGHT)**
+- <u>NCD_Name#</u> -> `varchar(100)`, not null, part of composite primary key, part of composite foreign key referring to (`NCD_Name`, `Effective_Date`) in table `RISK_MODEL`
+- <u>Effective_Date#</u> -> `date`, not null, part of composite primary key, part of composite foreign key referring to (`NCD_Name`, `Effective_Date`) in table `RISK_MODEL`
+- <u>ICD_Code#</u> -> `varchar(10)`, not null, part of composite primary key, refers to `ICD_Code` in table `MEDICAL_CONDITION`
+- Risk_Weight -> `decimal(5,2)`, not null, numerical scoring weight assigned to the condition (must be ≥ 0)
+- Primary key is (<u>NCD_Name#</u>, <u>Effective_Date#</u>, <u>ICD_Code#</u>)
 
-**RISK_ASSESSMENT (ASSESSMENT_NUMBER, ASSESSMENT_DATE, SCORE, RISK_LEVEL, PATIENT_SSN#, NCD_NAME#, EFFECTIVE_DATE#)**
-- <u>Assessment_Number</u> &nbsp; `int`, auto increment
-- Assessment_Date &nbsp; `datetime`, not null
-- Score &nbsp; `decimal(5,2)`, not null, must be ≥ 0
-- Risk_Level &nbsp; `varchar(10)`, not null, one of `Low` / `Medium` / `High`
-- Patient_SSN# &nbsp; `char(9)`, not null, refers to `SSN` in the table `PATIENT`
-- NCD_Name# &nbsp; `varchar(100)`, refers to `NCD_Name` in the table `RISK_MODEL` (nullable, conceptual `Generates` is `0:1`)
-- Effective_Date# &nbsp; `date`, refers to `Effective_Date` in the table `RISK_MODEL` (nullable, together with `NCD_Name`)
+**RISK_ASSESSMENT (<u>ASSESSMENT_NUMBER</u>, ASSESSMENT_DATE, SCORE, RISK_LEVEL, PATIENT_SSN#, NCD_NAME#, EFFECTIVE_DATE#)**
+- <u>Assessment_Number</u> -> `int`, auto increment, not null, unique risk assessment identifier
+- Assessment_Date -> `datetime`, not null, timestamp when the risk assessment was computed
+- Score -> `decimal(5,2)`, not null, calculated aggregate patient risk score (must be ≥ 0)
+- Risk_Level -> `varchar(10)`, not null, resulting clinical triage level: one of `Low` / `Medium` / `High`
+- Patient_SSN# -> `char(9)`, not null, refers to `SSN` in table `PATIENT`
+- NCD_Name# -> `varchar(100)`, nullable, part of composite foreign key referring to (`NCD_Name`, `Effective_Date`) in table `RISK_MODEL`
+- Effective_Date# -> `date`, nullable, part of composite foreign key referring to (`NCD_Name`, `Effective_Date`) in table `RISK_MODEL`
 - Primary key is <u>Assessment_Number</u>
 
-**NOTIFICATION (ASSESSMENT_NUMBER#, DATE_NOTIFIED, RECIPIENT_USER_SSN#, MESSAGE)**
-- <u>Assessment_Number#</u> &nbsp; `int`, refers to `Assessment_Number` in the table `RISK_ASSESSMENT`
-- <u>Date_Notified</u> &nbsp; `datetime`, partial key of the weak entity
-- Recipient_User_SSN# &nbsp; `char(9)`, not null, refers to `SSN` in the table `USER`
-- Message &nbsp; `varchar(500)`, not null
-- Primary key is (`Assessment_Number`, `Date_Notified`)
-
+**NOTIFICATION (<u>ASSESSMENT_NUMBER#</u>, <u>DATE_NOTIFIED</u>, RECIPIENT_USER_SSN#, MESSAGE)**
+- <u>Assessment_Number#</u> -> `int`, not null, part of composite primary key, refers to `Assessment_Number` in table `RISK_ASSESSMENT`
+- <u>Date_Notified</u> -> `datetime`, not null, part of composite primary key, timestamp when the notification alert was dispatched
+- Recipient_User_SSN# -> `char(9)`, not null, refers to `SSN` in table `USER`
+- Message -> `varchar(500)`, not null, clinical alert text delivered to the recipient
+- Primary key is (<u>Assessment_Number#</u>, <u>Date_Notified</u>)
