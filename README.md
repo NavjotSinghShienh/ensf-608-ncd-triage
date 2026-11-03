@@ -127,22 +127,22 @@ In accordance with the ENSF 608 project continuity guidelines, the 15 preliminar
 | `Allocated To` | `Department` — `Room` | `1:1` to `1:N` | **Identifying relationship** for weak entity `Room`. |
 | `Assigned To` | `Department` — `Health Professional` | `1:1` to `0:N` | Each health professional is assigned to one department. |
 | `Works In` | `Department` — `Admin` | `1:1` to `0:N` | Each admin works in one department. |
-| `Attends` | `Patient` — `Appointment` | `1:1` to `1:N` | Each appointment is attended by one patient. |
-| `Conducts` | `Doctor` — `Appointment` | `1:1` to `1:N` | Each appointment is conducted by one doctor. |
+| `Attends` | `Patient` — `Appointment` | `1:1` to `0:N` | Each appointment is attended by one patient; a patient may have zero or more appointments. |
+| `Conducts` | `Doctor` — `Appointment` | `1:1` to `0:N` | Each appointment is conducted by one doctor; a doctor may conduct zero or more appointments. |
 | `Books` | `Admin` — `Appointment` | `1:1` to `0:N` | Admin staff book appointments. |
-| `Happens At` | `Room` — `Appointment` | `1:1` to `1:N` | Each appointment is hosted in a specific department room. |
+| `Happens At` | `Room` — `Appointment` | `1:1` to `0:N` | Each appointment is hosted in a specific department room; a room may host zero or more appointments. |
 | `Requires` | `Appointment` — `Lab Test` | `1:1` to `0:N` | An appointment may require zero or more lab tests. |
 | `Performs` | `Lab_assistant` — `Lab Test` | `1:1` to `0:N` | A lab assistant performs zero or more lab tests. |
-| `Process` | `Test Type` — `Lab Test` | `1:1` to `1:N` | Each lab test instance follows a standardized test type definition. |
+| `Process` | `Test Type` — `Lab Test` | `1:1` to `0:N` | Each lab test instance follows a standardized test type definition; a test type may have zero or more lab test instances. |
 | `Maintains` | `Admin` — `Test Type` | `1:1` to `0:N` | Admins maintain the standardized test catalog. |
-| `Prescribes` | `Appointment` — `Medication` | `0:N` to `1:N` | Attributes: `Dose`, `Instruction`, `Status`. |
-| `Recommends` | `Appointment` — `Treatment Type` | `0:N` to `1:N` | Attributes: `Treatment_Date`, `Status`. |
+| `Prescribes` | `Appointment` — `Medication` | `0:N` to `0:N` | Attributes: `Dose`, `Instruction`, `Status`. |
+| `Recommends` | `Appointment` — `Treatment Type` | `0:N` to `0:N` | Attributes: `Treatment_Date`, `Status`. |
 | `Diagnosed With` | `Patient` — `Medical Condition` | `0:N` to `0:N` | Attributes: `Diagnosis_Date`, `Status`. |
 | `Indicates` | `Test Type` — `Medical Condition` | `0:N` to `0:N` | Attributes: `Operator`, `Abnormality_Threshold`. |
 | `Evaluates` | `Risk Model` — `Medical Condition` | `1:N` to `0:N` | Attribute: `Risk_weight`. |
 | `Manages` | `Admin` — `Risk Model` | `1:1` to `0:N` | Admins manage risk model versions. |
 | `Consists of` | `Risk Model` — `Risk Threshold` | `1:1` to `3:3` | **Identifying relationship** for weak entity `Risk Threshold`. |
-| `Generates` | `Risk Model` — `Risk Assessment` | `0:1` to `0:N` | Risk model version used to compute a risk assessment. |
+| `Generates` | `Risk Model` — `Risk Assessment` | `1:1` to `0:N` | Each Risk Assessment is evaluated by exactly one Risk Model version (1:1 mandatory), while a Risk Model can generate zero or more Risk Assessments over time (0:N). |
 | `Undergoes` | `Patient` — `Risk Assessment` | `1:1` to `0:N` | A patient undergoes risk assessments over time. |
 | `Triggers` | `Risk Assessment` — `Notification` | `1:1` to `0:N` | **Identifying relationship** for weak entity `Notification`. |
 | `Receives` | `User` — `Notification` | `1:1` to `0:N` | System user who receives the generated notification alert. |

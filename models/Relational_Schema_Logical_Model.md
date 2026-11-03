@@ -160,7 +160,7 @@
 **MEDICAL_CONDITION (<ins>ICD_CODE</ins>, CONDITION_NAME, CATEGORY)**
 - <ins>ICD_Code</ins> -> `varchar(10)`, not null, standardized International Classification of Diseases (ICD) code
 - Condition_Name -> `varchar(150)`, unique, not null, candidate key (clinical name of the medical condition or risk factor)
-- Category -> `varchar(50)`, condition classification (e.g., `Cardiovascular`, `Metabolic`, `Respiratory`, `Lifestyle`)
+- Category -> `varchar(50)`, condition classification (e.g., `Cardiovascular`, `Metabolic`, `Respiratory`, `Oncological`, `Renal`, `Neurological`, `Lifestyle`, `Genetic / Family History`)
 - Primary key is <ins>ICD_Code</ins>
 
 **PATIENT_DIAGNOSIS (<ins>PATIENT_SSN#</ins>, <ins>ICD_CODE#</ins>, DIAGNOSIS_DATE, STATUS)**
@@ -209,8 +209,8 @@
 - Score -> `decimal(5,2)`, not null, calculated aggregate patient risk score (must be ≥ 0)
 - Risk_Level -> `varchar(10)`, not null, resulting clinical triage level: one of `Low` / `Medium` / `High`
 - Patient_SSN# -> `char(9)`, not null, refers to `SSN` in table `PATIENT`
-- NCD_Name# -> `varchar(100)`, nullable, part of composite foreign key referring to (`NCD_Name`, `Effective_Date`) in table `RISK_MODEL`
-- Effective_Date# -> `date`, nullable, part of composite foreign key referring to (`NCD_Name`, `Effective_Date`) in table `RISK_MODEL`
+- NCD_Name# -> `varchar(100)`, not null, part of composite foreign key referring to (`NCD_Name`, `Effective_Date`) in table `RISK_MODEL`
+- Effective_Date# -> `date`, not null, part of composite foreign key referring to (`NCD_Name`, `Effective_Date`) in table `RISK_MODEL`
 - Primary key is <ins>Assessment_Number</ins>
 
 **NOTIFICATION (<ins>ASSESSMENT_NUMBER#</ins>, <ins>DATE_NOTIFIED</ins>, RECIPIENT_USER_SSN#, MESSAGE)**
