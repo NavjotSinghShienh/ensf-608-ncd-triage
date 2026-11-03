@@ -159,109 +159,109 @@ In accordance with the ENSF 608 project continuity guidelines, the 15 preliminar
 
 ### Complete Relational Schema (25 Tables)
 
-Below is the complete relational schema mapped from the Conceptual EER Model. **Primary Keys (PK)** are underlined (`<u>...</u>`) and **Foreign Keys (FK)** are marked with `#` and explicitly noted with their referenced target tables.
+Below is the complete relational schema mapped from the Conceptual EER Model. **Primary Keys (PK)** are underlined (`<ins>...</ins>`) and **Foreign Keys (FK)** are marked with `#` and explicitly noted with their referenced target tables.
 
 #### A. Identity, Roles & Specialization Tables
-1. **`USER` (<u>SSN</u>, FIRST_NAME, LAST_NAME, DOB, ADDRESS, EMAIL, PASSWORD, PHONE_NUMBER, STATUS)**
-   - **PK:** <u>SSN</u>
+1. **`USER` (<ins>SSN</ins>, FIRST_NAME, LAST_NAME, DOB, ADDRESS, EMAIL, PASSWORD, PHONE_NUMBER, STATUS)**
+   - **PK:** <ins>SSN</ins>
    - **Candidate Keys:** `Email` (Unique), `Phone_Number` (Unique)
-2. **`PATIENT` (<u>SSN#</u>, HEALTHCARE_NUMBER, GENDER, BLOOD_TYPE, STATUS)**
-   - **PK:** <u>SSN#</u>
+2. **`PATIENT` (<ins>SSN#</ins>, HEALTHCARE_NUMBER, GENDER, BLOOD_TYPE, STATUS)**
+   - **PK:** <ins>SSN#</ins>
    - **FK:** `SSN#` $\rightarrow$ `USER(SSN)`
    - **Candidate Key:** `Healthcare_Number` (Unique)
-3. **`PATIENT_EMERGENCY_CONTACT` (<u>PATIENT_SSN#</u>, <u>CONTACT_NAME</u>, <u>CONTACT_PHONE_NUMBER</u>)**
-   - **PK:** (<u>Patient_SSN#</u>, <u>Contact_Name</u>, <u>Contact_Phone_Number</u>)
+3. **`PATIENT_EMERGENCY_CONTACT` (<ins>PATIENT_SSN#</ins>, <ins>CONTACT_NAME</ins>, <ins>CONTACT_PHONE_NUMBER</ins>)**
+   - **PK:** (<ins>Patient_SSN#</ins>, <ins>Contact_Name</ins>, <ins>Contact_Phone_Number</ins>)
    - **FK:** `Patient_SSN#` $\rightarrow$ `PATIENT(SSN)`
-4. **`ADMIN` (<u>SSN#</u>, ROLE, ISACTIVE, DEPARTMENT_NAME#)**
-   - **PK:** <u>SSN#</u>
+4. **`ADMIN` (<ins>SSN#</ins>, ROLE, ISACTIVE, DEPARTMENT_NAME#)**
+   - **PK:** <ins>SSN#</ins>
    - **FKs:** `SSN#` $\rightarrow$ `USER(SSN)`, `Department_Name#` $\rightarrow$ `DEPARTMENT(Department_Name)`
-5. **`HEALTH_PROFESSIONAL` (<u>SSN#</u>, EMPLOYEE_NUMBER, EMPLOYMENT_DATE, STATUS, DEPARTMENT_NAME#)**
-   - **PK:** <u>SSN#</u>
+5. **`HEALTH_PROFESSIONAL` (<ins>SSN#</ins>, EMPLOYEE_NUMBER, EMPLOYMENT_DATE, STATUS, DEPARTMENT_NAME#)**
+   - **PK:** <ins>SSN#</ins>
    - **FKs:** `SSN#` $\rightarrow$ `USER(SSN)`, `Department_Name#` $\rightarrow$ `DEPARTMENT(Department_Name)`
    - **Candidate Key:** `Employee_Number` (Unique)
-6. **`DOCTOR` (<u>SSN#</u>, LICENSE_NUMBER, SPECIALITY, QUALIFICATION)**
-   - **PK:** <u>SSN#</u>
+6. **`DOCTOR` (<ins>SSN#</ins>, LICENSE_NUMBER, SPECIALITY, QUALIFICATION)**
+   - **PK:** <ins>SSN#</ins>
    - **FK:** `SSN#` $\rightarrow$ `HEALTH_PROFESSIONAL(SSN)`
    - **Candidate Key:** `License_Number` (Unique)
-7. **`LAB_ASSISTANT` (<u>SSN#</u>, CERTIFICATION_NUMBER, CERTIFICATION_TYPE, LAB_SPECIALIZATION)**
-   - **PK:** <u>SSN#</u>
+7. **`LAB_ASSISTANT` (<ins>SSN#</ins>, CERTIFICATION_NUMBER, CERTIFICATION_TYPE, LAB_SPECIALIZATION)**
+   - **PK:** <ins>SSN#</ins>
    - **FK:** `SSN#` $\rightarrow$ `HEALTH_PROFESSIONAL(SSN)`
    - **Candidate Key:** `Certification_Number` (Unique)
 
 #### B. Healthcare Facility Infrastructure Tables
-8. **`FACILITY` (<u>FACILITY_NAME</u>, FACILITY_TYPE, ADDRESS_LINE1, ADDRESS_LINE2, CITY, STATE, COUNTRY)**
-   - **PK:** <u>Facility_Name</u>
-9. **`DEPARTMENT` (<u>DEPARTMENT_NAME</u>, LOCATION, FACILITY_NAME#)**
-   - **PK:** <u>Department_Name</u>
+8. **`FACILITY` (<ins>FACILITY_NAME</ins>, FACILITY_TYPE, ADDRESS_LINE1, ADDRESS_LINE2, CITY, STATE, COUNTRY)**
+   - **PK:** <ins>Facility_Name</ins>
+9. **`DEPARTMENT` (<ins>DEPARTMENT_NAME</ins>, LOCATION, FACILITY_NAME#)**
+   - **PK:** <ins>Department_Name</ins>
    - **FK:** `Facility_Name#` $\rightarrow$ `FACILITY(Facility_Name)`
-10. **`ROOM` (<u>DEPARTMENT_NAME#</u>, <u>ROOM_NUMBER</u>, ROOM_TYPE)**
-    - **PK:** (<u>Department_Name#</u>, <u>Room_Number</u>)
+10. **`ROOM` (<ins>DEPARTMENT_NAME#</ins>, <ins>ROOM_NUMBER</ins>, ROOM_TYPE)**
+    - **PK:** (<ins>Department_Name#</ins>, <ins>Room_Number</ins>)
     - **FK:** `Department_Name#` $\rightarrow$ `DEPARTMENT(Department_Name)`
 
 #### C. Clinical Appointments, Diagnostics & Care Plan Tables
-11. **`APPOINTMENT` (<u>APPOINTMENT_NUMBER</u>, APPOINTMENT_DATE, APPOINTMENT_TYPE, STATUS, PATIENT_SSN#, DOCTOR_SSN#, ADMIN_SSN#, DEPARTMENT_NAME#, ROOM_NUMBER#)**
-    - **PK:** <u>Appointment_Number</u>
+11. **`APPOINTMENT` (<ins>APPOINTMENT_NUMBER</ins>, APPOINTMENT_DATE, APPOINTMENT_TYPE, STATUS, PATIENT_SSN#, DOCTOR_SSN#, ADMIN_SSN#, DEPARTMENT_NAME#, ROOM_NUMBER#)**
+    - **PK:** <ins>Appointment_Number</ins>
     - **FKs:**
       - `Patient_SSN#` $\rightarrow$ `PATIENT(SSN)`
       - `Doctor_SSN#` $\rightarrow$ `DOCTOR(SSN)`
       - `Admin_SSN#` $\rightarrow$ `ADMIN(SSN)`
       - (`Department_Name#`, `Room_Number#`) $\rightarrow$ `ROOM(Department_Name, Room_Number)`
-12. **`TEST_TYPE` (<u>TEST_NAME</u>, MIN_RANGE, MAX_RANGE, ADMIN_SSN#)**
-    - **PK:** <u>Test_Name</u>
+12. **`TEST_TYPE` (<ins>TEST_NAME</ins>, MIN_RANGE, MAX_RANGE, ADMIN_SSN#)**
+    - **PK:** <ins>Test_Name</ins>
     - **FK:** `Admin_SSN#` $\rightarrow$ `ADMIN(SSN)`
-13. **`LAB_TEST` (<u>ACCESSION_NUMBER</u>, TEST_DATE, TEST_RESULT, STATUS, APPOINTMENT_NUMBER#, LAB_ASSISTANT_SSN#, TEST_NAME#)**
-    - **PK:** <u>Accession_Number</u>
+13. **`LAB_TEST` (<ins>ACCESSION_NUMBER</ins>, TEST_DATE, TEST_RESULT, STATUS, APPOINTMENT_NUMBER#, LAB_ASSISTANT_SSN#, TEST_NAME#)**
+    - **PK:** <ins>Accession_Number</ins>
     - **FKs:**
       - `Appointment_Number#` $\rightarrow$ `APPOINTMENT(Appointment_Number)`
       - `Lab_Assistant_SSN#` $\rightarrow$ `LAB_ASSISTANT(SSN)`
       - `Test_Name#` $\rightarrow$ `TEST_TYPE(Test_Name)`
-14. **`TREATMENT_TYPE` (<u>TREATMENT_CODE</u>, TREATMENT_NAME, TREATMENT_CATEGORY)**
-    - **PK:** <u>Treatment_Code</u>
-15. **`APPOINTMENT_TREATMENT` (<u>APPOINTMENT_NUMBER#</u>, <u>TREATMENT_CODE#</u>, TREATMENT_DATE, STATUS)**
-    - **PK:** (<u>Appointment_Number#</u>, <u>Treatment_Code#</u>)
+14. **`TREATMENT_TYPE` (<ins>TREATMENT_CODE</ins>, TREATMENT_NAME, TREATMENT_CATEGORY)**
+    - **PK:** <ins>Treatment_Code</ins>
+15. **`APPOINTMENT_TREATMENT` (<ins>APPOINTMENT_NUMBER#</ins>, <ins>TREATMENT_CODE#</ins>, TREATMENT_DATE, STATUS)**
+    - **PK:** (<ins>Appointment_Number#</ins>, <ins>Treatment_Code#</ins>)
     - **FKs:**
       - `Appointment_Number#` $\rightarrow$ `APPOINTMENT(Appointment_Number)`
       - `Treatment_Code#` $\rightarrow$ `TREATMENT_TYPE(Treatment_Code)`
-16. **`MEDICATION` (<u>DIN</u>, GENERIC_NAME, BRAND_NAME)**
-    - **PK:** <u>DIN</u>
-17. **`APPOINTMENT_PRESCRIPTION` (<u>APPOINTMENT_NUMBER#</u>, <u>DIN#</u>, DOSE, INSTRUCTION, STATUS)**
-    - **PK:** (<u>Appointment_Number#</u>, <u>DIN#</u>)
+16. **`MEDICATION` (<ins>DIN</ins>, GENERIC_NAME, BRAND_NAME)**
+    - **PK:** <ins>DIN</ins>
+17. **`APPOINTMENT_PRESCRIPTION` (<ins>APPOINTMENT_NUMBER#</ins>, <ins>DIN#</ins>, DOSE, INSTRUCTION, STATUS)**
+    - **PK:** (<ins>Appointment_Number#</ins>, <ins>DIN#</ins>)
     - **FKs:**
       - `Appointment_Number#` $\rightarrow$ `APPOINTMENT(Appointment_Number)`
       - `DIN#` $\rightarrow$ `MEDICATION(DIN)`
 
 #### D. Medical Conditions, Risk Models & Triage Alerting Tables
-18. **`MEDICAL_CONDITION` (<u>ICD_CODE</u>, CONDITION_NAME, CATEGORY)**
-    - **PK:** <u>ICD_Code</u>
+18. **`MEDICAL_CONDITION` (<ins>ICD_CODE</ins>, CONDITION_NAME, CATEGORY)**
+    - **PK:** <ins>ICD_Code</ins>
     - **Candidate Key:** `Condition_Name` (Unique)
-19. **`PATIENT_DIAGNOSIS` (<u>PATIENT_SSN#</u>, <u>ICD_CODE#</u>, DIAGNOSIS_DATE, STATUS)**
-    - **PK:** (<u>Patient_SSN#</u>, <u>ICD_Code#</u>)
+19. **`PATIENT_DIAGNOSIS` (<ins>PATIENT_SSN#</ins>, <ins>ICD_CODE#</ins>, DIAGNOSIS_DATE, STATUS)**
+    - **PK:** (<ins>Patient_SSN#</ins>, <ins>ICD_Code#</ins>)
     - **FKs:**
       - `Patient_SSN#` $\rightarrow$ `PATIENT(SSN)`
       - `ICD_Code#` $\rightarrow$ `MEDICAL_CONDITION(ICD_Code)`
-20. **`TEST_THRESHOLD_RULE` (<u>TEST_NAME#</u>, <u>ICD_CODE#</u>, ABNORMALITY_THRESHOLD, OPERATOR)**
-    - **PK:** (<u>Test_Name#</u>, <u>ICD_Code#</u>)
+20. **`TEST_THRESHOLD_RULE` (<ins>TEST_NAME#</ins>, <ins>ICD_CODE#</ins>, ABNORMALITY_THRESHOLD, OPERATOR)**
+    - **PK:** (<ins>Test_Name#</ins>, <ins>ICD_Code#</ins>)
     - **FKs:**
       - `Test_Name#` $\rightarrow$ `TEST_TYPE(Test_Name)`
       - `ICD_Code#` $\rightarrow$ `MEDICAL_CONDITION(ICD_Code)`
-21. **`RISK_MODEL` (<u>NCD_NAME</u>, <u>EFFECTIVE_DATE</u>, DESCRIPTION, ADMIN_SSN#)**
-    - **PK:** (<u>NCD_Name</u>, <u>Effective_Date</u>)
+21. **`RISK_MODEL` (<ins>NCD_NAME</ins>, <ins>EFFECTIVE_DATE</ins>, DESCRIPTION, ADMIN_SSN#)**
+    - **PK:** (<ins>NCD_Name</ins>, <ins>Effective_Date</ins>)
     - **FK:** `Admin_SSN#` $\rightarrow$ `ADMIN(SSN)`
-22. **`RISK_THRESHOLD` (<u>NCD_NAME#</u>, <u>EFFECTIVE_DATE#</u>, <u>RISK_TIER</u>, MIN_SCORE, MAX_SCORE)**
-    - **PK:** (<u>NCD_Name#</u>, <u>Effective_Date#</u>, <u>Risk_Tier</u>)
+22. **`RISK_THRESHOLD` (<ins>NCD_NAME#</ins>, <ins>EFFECTIVE_DATE#</ins>, <ins>RISK_TIER</ins>, MIN_SCORE, MAX_SCORE)**
+    - **PK:** (<ins>NCD_Name#</ins>, <ins>Effective_Date#</ins>, <ins>Risk_Tier</ins>)
     - **FK:** (`NCD_Name#`, `Effective_Date#`) $\rightarrow$ `RISK_MODEL(NCD_Name, Effective_Date)`
-23. **`RISK_MODEL_EVALUATION` (<u>NCD_NAME#</u>, <u>EFFECTIVE_DATE#</u>, <u>ICD_CODE#</u>, RISK_WEIGHT)**
-    - **PK:** (<u>NCD_Name#</u>, <u>Effective_Date#</u>, <u>ICD_Code#</u>)
+23. **`RISK_MODEL_EVALUATION` (<ins>NCD_NAME#</ins>, <ins>EFFECTIVE_DATE#</ins>, <ins>ICD_CODE#</ins>, RISK_WEIGHT)**
+    - **PK:** (<ins>NCD_Name#</ins>, <ins>Effective_Date#</ins>, <ins>ICD_Code#</ins>)
     - **FKs:**
       - (`NCD_Name#`, `Effective_Date#`) $\rightarrow$ `RISK_MODEL(NCD_Name, Effective_Date)`
       - `ICD_Code#` $\rightarrow$ `MEDICAL_CONDITION(ICD_Code)`
-24. **`RISK_ASSESSMENT` (<u>ASSESSMENT_NUMBER</u>, ASSESSMENT_DATE, SCORE, RISK_LEVEL, PATIENT_SSN#, NCD_NAME#, EFFECTIVE_DATE#)**
-    - **PK:** <u>Assessment_Number</u>
+24. **`RISK_ASSESSMENT` (<ins>ASSESSMENT_NUMBER</ins>, ASSESSMENT_DATE, SCORE, RISK_LEVEL, PATIENT_SSN#, NCD_NAME#, EFFECTIVE_DATE#)**
+    - **PK:** <ins>Assessment_Number</ins>
     - **FKs:**
       - `Patient_SSN#` $\rightarrow$ `PATIENT(SSN)`
       - (`NCD_Name#`, `Effective_Date#`) $\rightarrow$ `RISK_MODEL(NCD_Name, Effective_Date)`
-25. **`NOTIFICATION` (<u>ASSESSMENT_NUMBER#</u>, <u>DATE_NOTIFIED</u>, RECIPIENT_USER_SSN#, MESSAGE)**
-    - **PK:** (<u>Assessment_Number#</u>, <u>Date_Notified</u>)
+25. **`NOTIFICATION` (<ins>ASSESSMENT_NUMBER#</ins>, <ins>DATE_NOTIFIED</ins>, RECIPIENT_USER_SSN#, MESSAGE)**
+    - **PK:** (<ins>Assessment_Number#</ins>, <ins>Date_Notified</ins>)
     - **FKs:**
       - `Assessment_Number#` $\rightarrow$ `RISK_ASSESSMENT(Assessment_Number)`
       - `Recipient_User_SSN#` $\rightarrow$ `USER(SSN)`
