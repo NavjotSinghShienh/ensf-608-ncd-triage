@@ -58,7 +58,7 @@
 
 **ADMIN (<ins>SSN#</ins>, ROLE, ISACTIVE, DEPARTMENT_NAME#)**
 - <ins>SSN#</ins> -> `char(9)`, not null, refers to `SSN` in table `USER`
-- Role -> `varchar(50)`, not null, administrative job role (e.g., `Receptionist`, `Security Admin`)
+- Role -> `varchar(50)`, not null, administrative job role: one of `Receptionist` / `Clinical Admin` / `System Admin` / `Security Admin`
 - IsActive -> `boolean (tinyint(1))`, not null, default `true`, indicates whether administrative privileges are active
 - Department_Name# -> `varchar(100)`, not null, refers to `Department_Name` in table `DEPARTMENT`
 - Primary key is <ins>SSN#</ins>
@@ -69,7 +69,7 @@
 
 **FACILITY (<ins>FACILITY_NAME</ins>, FACILITY_TYPE, ADDRESS_LINE1, ADDRESS_LINE2, CITY, STATE, COUNTRY)**
 - <ins>Facility_Name</ins> -> `varchar(100)`, not null, unique official name of the healthcare institution
-- Facility_Type -> `varchar(50)`, not null, type of healthcare facility (e.g., `Hospital`, `Clinic`, `Diagnostic Center`)
+- Facility_Type -> `varchar(50)`, not null, type of healthcare facility: one of `Hospital` / `Clinic` / `Diagnostic Center`
 - Address_Line1 -> `varchar(100)`, not null, primary street address line
 - Address_Line2 -> `varchar(100)`, secondary address line (suite, building, or floor)
 - City -> `varchar(50)`, not null, city name
@@ -86,7 +86,7 @@
 **ROOM (<ins>DEPARTMENT_NAME#</ins>, <ins>ROOM_NUMBER</ins>, ROOM_TYPE)**
 - <ins>Department_Name#</ins> -> `varchar(100)`, not null, part of composite primary key, refers to `Department_Name` in table `DEPARTMENT`
 - <ins>Room_Number</ins> -> `varchar(10)`, not null, part of composite primary key, room identifier within the department
-- Room_Type -> `varchar(50)`, functional classification of the room (e.g., `Consultation`, `Lab`, `Procedure`)
+- Room_Type -> `varchar(50)`, functional classification of the room: one of `Consultation` / `Lab` / `Procedure`
 - Primary key is (<ins>Department_Name#</ins>, <ins>Room_Number</ins>)
 
 ---
@@ -96,7 +96,7 @@
 **APPOINTMENT (<ins>APPOINTMENT_NUMBER</ins>, APPOINTMENT_DATE, APPOINTMENT_TYPE, STATUS, PATIENT_SSN#, DOCTOR_SSN#, ADMIN_SSN#, DEPARTMENT_NAME#, ROOM_NUMBER#)**
 - <ins>Appointment_Number</ins> -> `int`, auto increment, not null, unique appointment identifier
 - Appointment_Date -> `datetime`, not null, scheduled date and time of the appointment
-- Appointment_Type -> `varchar(50)`, not null, visit category (e.g., `Initial Consultation`, `Follow-Up`, `Routine Checkup`)
+- Appointment_Type -> `varchar(50)`, not null, visit category: one of `Initial Consultation` / `Follow-Up` / `Routine Checkup` / `Emergency`
 - Status -> `varchar(20)`, not null, appointment state: one of `Scheduled` / `Completed` / `Cancelled` / `No-Show`
 - Patient_SSN# -> `char(9)`, not null, refers to `SSN` in table `PATIENT`
 - Doctor_SSN# -> `char(9)`, not null, refers to `SSN` in table `DOCTOR`
@@ -108,7 +108,7 @@
 **TREATMENT_TYPE (<ins>TREATMENT_CODE</ins>, TREATMENT_NAME, TREATMENT_CATEGORY)**
 - <ins>Treatment_Code</ins> -> `varchar(20)`, not null, standardized clinical procedure/therapy code
 - Treatment_Name -> `varchar(100)`, not null, descriptive name of the treatment or procedure
-- Treatment_Category -> `varchar(50)`, clinical classification (e.g., `Lifestyle Intervention`, `Surgical`, `Dialysis`, `Therapy`)
+- Treatment_Category -> `varchar(50)`, clinical classification: one of `Lifestyle Intervention` / `Surgical` / `Dialysis` / `Therapy` / `Monitoring`
 - Primary key is <ins>Treatment_Code</ins>
 
 **APPOINTMENT_TREATMENT (<ins>APPOINTMENT_NUMBER#</ins>, <ins>TREATMENT_CODE#</ins>, TREATMENT_DATE, STATUS)**
@@ -160,7 +160,7 @@
 **MEDICAL_CONDITION (<ins>ICD_CODE</ins>, CONDITION_NAME, CATEGORY)**
 - <ins>ICD_Code</ins> -> `varchar(10)`, not null, standardized International Classification of Diseases (ICD) code
 - Condition_Name -> `varchar(150)`, unique, not null, candidate key (clinical name of the medical condition or risk factor)
-- Category -> `varchar(50)`, condition classification (e.g., `Cardiovascular`, `Metabolic`, `Respiratory`, `Oncological`, `Renal`, `Neurological`, `Lifestyle`, `Genetic / Family History`)
+- Category -> `varchar(50)`, condition classification: one of `Cardiovascular` / `Metabolic` / `Respiratory` / `Oncological` / `Renal` / `Neurological` / `Lifestyle` / `Family History`
 - Primary key is <ins>ICD_Code</ins>
 
 **PATIENT_DIAGNOSIS (<ins>PATIENT_SSN#</ins>, <ins>ICD_CODE#</ins>, DIAGNOSIS_DATE, STATUS)**
