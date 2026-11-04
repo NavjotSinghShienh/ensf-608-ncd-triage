@@ -160,7 +160,7 @@
 **MEDICAL_CONDITION (<ins>ICD_CODE</ins>, CONDITION_NAME, CATEGORY)**
 - <ins>ICD_Code</ins> -> `varchar(10)`, not null, standardized International Classification of Diseases (ICD) code
 - Condition_Name -> `varchar(150)`, unique, not null, candidate key (clinical name of the medical condition or risk factor)
-- Category -> `varchar(50)`, condition classification: one of `Cardiovascular` / `Metabolic` / `Respiratory` / `Oncological` / `Renal` / `Neurological` / `Lifestyle` / `Family History`
+- Category -> `varchar(50)`, condition classification: one of `Cardiovascular` / `Oncological` / `Metabolic` / `Respiratory` / `Lifestyle` / `Family History`
 - Primary key is <ins>ICD_Code</ins>
 
 **PATIENT_DIAGNOSIS (<ins>PATIENT_SSN#</ins>, <ins>ICD_CODE#</ins>, DIAGNOSIS_DATE, STATUS)**

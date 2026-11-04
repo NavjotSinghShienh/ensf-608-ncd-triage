@@ -70,7 +70,9 @@ ensf-608-ncd-triage/
 │   ├── Logical_Model.drawio                  # Editable Draw.io Relational Logical Model
 │   ├── Logical_Model_Image.png               # Exported Logical Model schema diagram (PNG)
 │   └── Relational_Schema_Logical_Model.md    # Relational Schema with data types, domains & keys
-├── scripts/                                  # SQL DDL, DML, seed data, queries, and test scripts
+├── scripts/
+│   ├── DDL.sql                               # Physical SQL database creation & constraints
+│   └── populate.sql                          # Real-world clinical seed data (ICD-10, DINs, AHS sites)
 └── README.md                                 # Project documentation
 ```
 
