@@ -64,6 +64,8 @@ This database operationalizes **United Nations Sustainable Development Goal 3: G
 
 ```text
 ensf-608-ncd-triage/
+├── docs/
+│   └── Normalization_Decisions.docx          # Detailed 1NF, 2NF, 3NF decisions & FD registry
 ├── models/
 │   ├── Conceptual_Model.drawio               # Editable Draw.io EER Conceptual Model
 │   ├── Conceptual_Model_Image.png            # Exported Conceptual Model diagram (PNG)
@@ -71,8 +73,7 @@ ensf-608-ncd-triage/
 │   ├── Logical_Model_Image.png               # Exported Logical Model schema diagram (PNG)
 │   └── Relational_Schema_Logical_Model.md    # Relational Schema with data types, domains & keys
 ├── scripts/
-│   ├── DDL.sql                               # Physical SQL database creation & constraints
-│   └── populate.sql                          # Real-world clinical seed data (ICD-10, DINs, AHS sites)
+│   └── DDL.sql                               # Physical SQL database creation & constraints
 └── README.md                                 # Project documentation
 ```
 
@@ -272,20 +273,67 @@ Below is the complete relational schema mapped from the Conceptual EER Model. **
 
 ## 8. Normalization Summary (1NF, 2NF, 3NF)
 
+- **Detailed Normalization Document:** [`docs/Normalization_Decisions.docx`](docs/Normalization_Decisions.docx)
+
 The relational schema satisfies **First Normal Form (1NF)**, **Second Normal Form (2NF)**, and **Third Normal Form (3NF)**:
 
-1. **First Normal Form (1NF) — Atomic Attributes & Removal of Repeating Groups:**
-   - Composite attributes (`User.Name`, `User.Login`, `Facility.Address`) are decomposed into atomic columns (`First_Name`, `Last_Name`, `Email`, `Password`, `Address_Line1`, `Address_Line2`, `City`, `State`, `Country`).
-   - The multivalued composite attribute `Emergency Contact` on `Patient` is extracted into a dedicated relation `Patient_Emergency_Contact(Patient_SSN, Contact_Name, Contact_Phone_Number)`.
-2. **Second Normal Form (2NF) — Elimination of Partial Dependencies:**
-   - Every non-key attribute in tables with composite primary keys (`Room`, `Patient_Diagnosis`, `Risk_Model`, `Risk_Threshold`, `Risk_Model_Evaluation`, `Test_Threshold_Rule`, `Appointment_Treatment`, `Appointment_Prescription`, `Notification`) is fully functionally dependent on the *entire* composite primary key.
-   - For example, in `Appointment_Prescription(Appointment_Number, DIN)`, `Dose`, `Instruction`, and `Status` depend on both the specific appointment and the specific medication (`DIN`), while drug-specific attributes (`Generic_Name`, `Brand_Name`) reside solely in `Medication(DIN)`.
-   - Similarly, in `Appointment_Treatment(Appointment_Number, Treatment_Code)`, `Treatment_Date` and `Status` depend on the full key, whereas `Treatment_Name` and `Treatment_Category` depend only on `Treatment_Code` and are isolated in `Treatment_Type`.
-3. **Third Normal Form (3NF) — Elimination of Transitive Dependencies:**
-   - Non-key attributes depend *only* on the primary key and not on other non-key attributes.
-   - **Lab Tests vs. Test Types:** Reference range metadata (`Min_Range`, `Max_Range`) depends on `Test_Name` rather than `Accession_Number`. Separating `Test_Type` from `Lab_Test` removes the transitive dependency `Accession_Number` $\rightarrow$ `Test_Name` $\rightarrow$ (`Min_Range`, `Max_Range`).
-   - **Facility vs. Department vs. Room:** Facility address details (`Address_Line1`, `City`, `State`, `Country`) depend on `Facility_Name` and are stored in `Facility`, while `Department` references `Facility_Name` as a foreign key rather than duplicating facility address fields.
-   - **Role Specialization:** Role-specific attributes (`License_Number`, `Speciality`, `Qualification` for `Doctor`; `Certification_Number`, `Lab_Specialization` for `Lab_Assistant`; `Healthcare_Number`, `Blood_Type` for `Patient`) are placed in their respective subtype relations rather than introducing nullable or transitively dependent columns in `User`.
+### First Normal Form (1NF) — Atomic Values & Removal of Repeating Groups
+1. **Decomposing Composite Attributes:** Composite attributes from the EER diagram were broken into atomic columns:
+   - `User.Name` $\rightarrow$ `First_Name` and `Last_Name`
+   - `User.Login` $\rightarrow$ `Email` and `Password`
+   - `Facility.Address` $\rightarrow$ `Address_Line1`, `Address_Line2`, `City`, `State`, and `Country`
+   - `Risk_Model.Model_Key` $\rightarrow$ `NCD_Name` and `Effective_Date`
+2. **Extracting Multivalued Composite Attributes:** On the EER diagram, `Patient.Emergency Contact` is a multivalued composite attribute. Storing comma-separated lists or repeating columns (`Contact1`, `Contact2`) in `PATIENT` would violate 1NF, so it was extracted into a dedicated relation: `PATIENT_EMERGENCY_CONTACT(Patient_SSN, Contact_Name, Contact_Phone_Number)`.
+3. **Single-Valued Contact & Omission of Derived Attributes:** `Phone_Number` in `USER` is kept as a single, unique atomic value, and the derived attribute `Age` is omitted from physical storage (calculated dynamically from `DOB` in queries to prevent update anomalies).
+
+### Second Normal Form (2NF) — Elimination of Partial Dependencies
+Every non-key attribute in relations with composite primary keys depends on the **full** composite primary key:
+1. **`PATIENT_DIAGNOSIS` vs. `MEDICAL_CONDITION`:** Placing `Condition_Name` and `Category` inside `PATIENT_DIAGNOSIS(Patient_SSN, ICD_Code)` would create a partial dependency on `ICD_Code` alone. Disease metadata was moved into `MEDICAL_CONDITION(ICD_Code)`, leaving only `Diagnosis_Date` and `Status` (which depend on both patient and condition) in `PATIENT_DIAGNOSIS`.
+2. **`TEST_THRESHOLD_RULE` vs. `TEST_TYPE`:** Physiological reference bounds (`Min_Range`, `Max_Range`) depend only on `Test_Name`, not `ICD_Code`, so they reside in `TEST_TYPE(Test_Name)`. `TEST_THRESHOLD_RULE(Test_Name, ICD_Code)` retains only `Abnormality_Threshold` and `Operator`, which depend on both the test and the disease.
+3. **Treatments & Prescriptions:** `Treatment_Name` and `Treatment_Category` depend only on `Treatment_Code` (isolated in `TREATMENT_TYPE`), and `Generic_Name` and `Brand_Name` depend only on `DIN` (isolated in `MEDICATION`). The associative relations `APPOINTMENT_TREATMENT(Appointment_Number, Treatment_Code)` and `APPOINTMENT_PRESCRIPTION(Appointment_Number, DIN)` hold only visit-specific attributes (`Treatment_Date`, `Status`, `Dose`, `Instruction`) that require the entire composite key.
+4. **Risk Model Evaluations:** In `RISK_MODEL_EVALUATION(NCD_Name, Effective_Date, ICD_Code)`, `Risk_Weight` depends on all three key components because the same ICD condition can carry different weights across different NCD models and version dates.
+5. **Weak Entities & All-Key Relations:**
+   - In `ROOM(Department_Name, Room_Number)`, room numbers (e.g., `"101"`) can exist across multiple departments, so `Room_Type` depends on both `Department_Name` and `Room_Number`.
+   - In `NOTIFICATION(Assessment_Number, Date_Notified)`, both attributes are required to uniquely identify an alert instance and determine `Recipient_User_SSN` and `Message`.
+   - `PATIENT_EMERGENCY_CONTACT(Patient_SSN, Contact_Name, Contact_Phone_Number)` is an all-key relation with no non-prime attributes, making partial dependencies impossible.
+
+### Third Normal Form (3NF) — Elimination of Transitive Dependencies
+No non-key attribute transitively depends on another non-key attribute:
+1. **Candidate Keys & Alternate Unique Identifiers:** Several tables include `UNIQUE` candidate keys (`Email` and `Phone_Number` in `USER`, `Healthcare_Number` in `PATIENT`, `Employee_Number` in `HEALTH_PROFESSIONAL`, `License_Number` in `DOCTOR`, `Certification_Number` in `LAB_ASSISTANT`, `Condition_Name` in `MEDICAL_CONDITION`). Functional dependencies where a determinant is a candidate key (e.g., `Healthcare_Number` $\rightarrow$ `Blood_Type`) satisfy 3NF by definition.
+2. **Physical Infrastructure Split (`ROOM` $\rightarrow$ `DEPARTMENT` $\rightarrow$ `FACILITY`):** Storing facility address fields inside `ROOM` would create the transitive chain `Room` $\rightarrow$ `Department` $\rightarrow$ `Facility` $\rightarrow$ `Address`. Separating `ROOM` (`Room_Type`), `DEPARTMENT` (`Location`, `Facility_Name`), and `FACILITY` (`Facility_Type`, address columns) eliminates this transitive chain.
+3. **Laboratory Results (`LAB_TEST` vs. `TEST_TYPE`):** Storing reference ranges (`Min_Range`, `Max_Range`) inside `LAB_TEST` would introduce `Accession_Number` $\rightarrow$ `Test_Name` $\rightarrow$ (`Min_Range`, `Max_Range`). Keeping reference ranges in `TEST_TYPE` ensures `LAB_TEST` holds only specimen-specific facts.
+4. **Actor Foreign Keys in Operational Tables:** In `APPOINTMENT`, `LAB_TEST`, and `RISK_ASSESSMENT`, only foreign keys for participating actors (`Patient_SSN`, `Doctor_SSN`, `Admin_SSN`, `Lab_Assistant_SSN`) are stored rather than duplicating actor names or specialties.
+5. **Risk Assessments vs. Risk Thresholds (`RISK_ASSESSMENT` vs. `RISK_THRESHOLD`):** `RISK_ASSESSMENT` stores the computed `Score` and `Risk_Level`, while tier score boundaries (`Min_Score`, `Max_Score`) are isolated in `RISK_THRESHOLD(NCD_Name, Effective_Date, Risk_Tier)` to prevent transitive redundancy across assessments.
+
+### Complete Functional Dependency Registry
+
+| # | Relation | PK / CK | Non-Trivial Functional Dependencies | Form |
+| :---: | :--- | :--- | :--- | :---: |
+| 1 | `USER` | **PK:** `SSN`<br>**CK:** `Email`, `Phone_Number` | `SSN` $\rightarrow$ `First_Name, Last_Name, DOB, Address, Email, Password, Phone_Number, Status`<br>`Email` $\rightarrow$ `SSN`<br>`Phone_Number` $\rightarrow$ `SSN` | 3NF |
+| 2 | `PATIENT` | **PK:** `SSN`<br>**CK:** `Healthcare_Number` | `SSN` $\rightarrow$ `Healthcare_Number, Gender, Blood_Type, Status`<br>`Healthcare_Number` $\rightarrow$ `SSN` | 3NF |
+| 3 | `PATIENT_EMERGENCY_CONTACT` | **PK:** `(Patient_SSN, Contact_Name, Contact_Phone_Number)` | All-key; no non-prime attributes | 3NF |
+| 4 | `HEALTH_PROFESSIONAL` | **PK:** `SSN`<br>**CK:** `Employee_Number` | `SSN` $\rightarrow$ `Employee_Number, Employment_Date, Status, Department_Name`<br>`Employee_Number` $\rightarrow$ `SSN` | 3NF |
+| 5 | `DOCTOR` | **PK:** `SSN`<br>**CK:** `License_Number` | `SSN` $\rightarrow$ `License_Number, Speciality, Qualification`<br>`License_Number` $\rightarrow$ `SSN` | 3NF |
+| 6 | `LAB_ASSISTANT` | **PK:** `SSN`<br>**CK:** `Certification_Number` | `SSN` $\rightarrow$ `Certification_Number, Certification_Type, Lab_Specialization`<br>`Certification_Number` $\rightarrow$ `SSN` | 3NF |
+| 7 | `ADMIN` | **PK:** `SSN` | `SSN` $\rightarrow$ `Role, IsActive, Department_Name` | 3NF |
+| 8 | `FACILITY` | **PK:** `Facility_Name` | `Facility_Name` $\rightarrow$ `Facility_Type, Address_Line1, Address_Line2, City, State, Country` | 3NF |
+| 9 | `DEPARTMENT` | **PK:** `Department_Name` | `Department_Name` $\rightarrow$ `Location, Facility_Name` | 3NF |
+| 10 | `ROOM` | **PK:** `(Department_Name, Room_Number)` | `(Department_Name, Room_Number)` $\rightarrow$ `Room_Type` | 3NF |
+| 11 | `APPOINTMENT` | **PK:** `Appointment_Number` | `Appointment_Number` $\rightarrow$ `Appointment_Date, Appointment_Type, Status, Patient_SSN, Doctor_SSN, Admin_SSN, Department_Name, Room_Number` | 3NF |
+| 12 | `TREATMENT_TYPE` | **PK:** `Treatment_Code` | `Treatment_Code` $\rightarrow$ `Treatment_Name, Treatment_Category` | 3NF |
+| 13 | `APPOINTMENT_TREATMENT` | **PK:** `(Appointment_Number, Treatment_Code)` | `(Appointment_Number, Treatment_Code)` $\rightarrow$ `Treatment_Date, Status` | 3NF |
+| 14 | `MEDICATION` | **PK:** `DIN` | `DIN` $\rightarrow$ `Generic_Name, Brand_Name` | 3NF |
+| 15 | `APPOINTMENT_PRESCRIPTION` | **PK:** `(Appointment_Number, DIN)` | `(Appointment_Number, DIN)` $\rightarrow$ `Dose, Instruction, Status` | 3NF |
+| 16 | `TEST_TYPE` | **PK:** `Test_Name` | `Test_Name` $\rightarrow$ `Min_Range, Max_Range, Admin_SSN` | 3NF |
+| 17 | `LAB_TEST` | **PK:** `Accession_Number` | `Accession_Number` $\rightarrow$ `Test_Date, Test_Result, Status, Appointment_Number, Lab_Assistant_SSN, Test_Name` | 3NF |
+| 18 | `MEDICAL_CONDITION` | **PK:** `ICD_Code`<br>**CK:** `Condition_Name` | `ICD_Code` $\rightarrow$ `Condition_Name, Category`<br>`Condition_Name` $\rightarrow$ `ICD_Code` | 3NF |
+| 19 | `PATIENT_DIAGNOSIS` | **PK:** `(Patient_SSN, ICD_Code)` | `(Patient_SSN, ICD_Code)` $\rightarrow$ `Diagnosis_Date, Status` | 3NF |
+| 20 | `TEST_THRESHOLD_RULE` | **PK:** `(Test_Name, ICD_Code)` | `(Test_Name, ICD_Code)` $\rightarrow$ `Abnormality_Threshold, Operator` | 3NF |
+| 21 | `RISK_MODEL` | **PK:** `(NCD_Name, Effective_Date)` | `(NCD_Name, Effective_Date)` $\rightarrow$ `Description, Admin_SSN` | 3NF |
+| 22 | `RISK_THRESHOLD` | **PK:** `(NCD_Name, Effective_Date, Risk_Tier)` | `(NCD_Name, Effective_Date, Risk_Tier)` $\rightarrow$ `Min_Score, Max_Score` | 3NF |
+| 23 | `RISK_MODEL_EVALUATION` | **PK:** `(NCD_Name, Effective_Date, ICD_Code)` | `(NCD_Name, Effective_Date, ICD_Code)` $\rightarrow$ `Risk_Weight` | 3NF |
+| 24 | `RISK_ASSESSMENT` | **PK:** `Assessment_Number` | `Assessment_Number` $\rightarrow$ `Assessment_Date, Score, Risk_Level, Patient_SSN, NCD_Name, Effective_Date` | 3NF |
+| 25 | `NOTIFICATION` | **PK:** `(Assessment_Number, Date_Notified)` | `(Assessment_Number, Date_Notified)` $\rightarrow$ `Recipient_User_SSN, Message` | 3NF |
 
 ---
 
