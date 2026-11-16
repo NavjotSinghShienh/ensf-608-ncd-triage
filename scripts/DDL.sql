@@ -4,7 +4,7 @@ CREATE DATABASE NCD_Risk_Identification_System;
 USE NCD_Risk_Identification_System;
 
 -- =========================================================================
--- DROP TABLES (Reverse Dependency Order)
+-- DROP TABLES
 -- =========================================================================
 DROP TABLE IF EXISTS Notifications;
 DROP TABLE IF EXISTS Risk_Assessments;
@@ -33,7 +33,7 @@ DROP TABLE IF EXISTS Departments;
 DROP TABLE IF EXISTS Facilities;
 
 -- =========================================================================
--- B. ORGANIZATION TABLES
+-- CREATE TABLES
 -- =========================================================================
 
 -- 1. Facilities
@@ -62,7 +62,7 @@ CREATE TABLE Departments (
         ON UPDATE CASCADE
 );
 
--- 3. Rooms (Weak Entity of Departments -> ON DELETE CASCADE)
+-- 3. Rooms
 CREATE TABLE Rooms (
     Department_Name VARCHAR(100) NOT NULL,
     Room_Number VARCHAR(10) NOT NULL,
@@ -76,10 +76,6 @@ CREATE TABLE Rooms (
         Room_Type IN ('Consultation', 'Lab', 'Procedure')
     )
 );
-
--- =========================================================================
--- A. USER HIERARCHY TABLES
--- =========================================================================
 
 -- 4. Users
 CREATE TABLE Users (
@@ -119,7 +115,7 @@ CREATE TABLE Patients (
     )
 );
 
--- 6. Patient_Emergency_Contacts (Multivalued Attribute of Patients -> ON DELETE CASCADE)
+-- 6. Patient_Emergency_Contacts
 CREATE TABLE Patient_Emergency_Contacts (
     Patient_SSN CHAR(9) NOT NULL,
     Contact_Name VARCHAR(100) NOT NULL,
@@ -192,10 +188,6 @@ CREATE TABLE Admins (
         Role IN ('Receptionist', 'Clinical Admin', 'System Admin', 'Security Admin')
     )
 );
-
--- =========================================================================
--- C. APPOINTMENTS, TREATMENT AND MEDICATION TABLES
--- =========================================================================
 
 -- 11. Appointments
 CREATE TABLE Appointments (
@@ -292,10 +284,6 @@ CREATE TABLE Appointment_Prescriptions (
     )
 );
 
--- =========================================================================
--- D. LAB TESTING TABLES
--- =========================================================================
-
 -- 16. Test_Types
 CREATE TABLE Test_Types (
     Test_Name VARCHAR(100) NOT NULL,
@@ -333,10 +321,6 @@ CREATE TABLE Lab_Tests (
     )
 );
 
--- =========================================================================
--- E. CLINICAL CONDITIONS TABLES
--- =========================================================================
-
 -- 18. Medical_Conditions
 CREATE TABLE Medical_Conditions (
     ICD_Code VARCHAR(10) NOT NULL,
@@ -347,11 +331,9 @@ CREATE TABLE Medical_Conditions (
     CONSTRAINT CK_Medical_Conditions_Category CHECK (
         Category IN (
             'Cardiovascular',
+            'Oncological',
             'Metabolic',
             'Respiratory',
-            'Oncological',
-            'Renal',
-            'Neurological',
             'Lifestyle',
             'Family History'
         )
@@ -394,10 +376,6 @@ CREATE TABLE Test_Threshold_Rules (
     )
 );
 
--- =========================================================================
--- F. RISK MODELLING TABLES
--- =========================================================================
-
 -- 21. Risk_Models
 CREATE TABLE Risk_Models (
     NCD_Name VARCHAR(100) NOT NULL,
@@ -410,7 +388,7 @@ CREATE TABLE Risk_Models (
         ON UPDATE CASCADE
 );
 
--- 22. Risk_Thresholds (Weak Entity of Risk_Models -> ON DELETE CASCADE)
+-- 22. Risk_Thresholds
 CREATE TABLE Risk_Thresholds (
     NCD_Name VARCHAR(100) NOT NULL,
     Effective_Date DATE NOT NULL,
@@ -467,7 +445,7 @@ CREATE TABLE Risk_Assessments (
     )
 );
 
--- 25. Notifications (Weak Entity of Risk_Assessments -> ON DELETE CASCADE)
+-- 25. Notifications
 CREATE TABLE Notifications (
     Assessment_Number INT NOT NULL,
     Date_Notified DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
