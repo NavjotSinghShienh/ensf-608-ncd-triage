@@ -1,5 +1,7 @@
 ﻿-- Data Population
 
+USE NCD_Risk_Identification_System;
+
 -- Disable foreign key checks during cleanup if necessary
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -476,13 +478,13 @@ INSERT INTO Risk_Model_Evaluations (NCD_Name, Effective_Date, ICD_Code, Risk_Wei
 -- =========================================================================
 INSERT INTO Risk_Assessments (Assessment_Number, Assessment_Date, Score, Risk_Level, Patient_SSN, NCD_Name, Effective_Date) VALUES
 (501, '2026-08-11 11:00:00', 80.00, 'High', '400000001', 'Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01'),
-(502, '2026-08-16 12:30:00', 45.00, 'Medium', '400000002', 'Metabolic & Type 2 Diabetes Complication Model', '2026-01-01'),
+(502, '2026-08-16 12:30:00', 65.00, 'High', '400000002', 'Metabolic & Type 2 Diabetes Complication Model', '2026-01-01'),
 (503, '2026-08-21 15:00:00', 70.00, 'High', '400000003', 'Cancer Risk Triage Model', '2026-01-01'),
 (504, '2026-09-06 14:00:00', 50.00, 'Medium', '400000004', 'Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01'),
 (505, '2026-09-13 10:00:00', 15.00, 'Low', '400000005', 'Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01'),
-(506, '2026-09-26 16:30:00', 85.00, 'High', '400000006', 'Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01'),
+(506, '2026-09-26 16:30:00', 100.00, 'High', '400000006', 'Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01'),
 (507, '2026-10-03 11:30:00', 30.00, 'Medium', '400000007', 'Chronic Respiratory Disease Exacerbation Risk Model', '2026-01-01'),
-(508, '2026-10-19 14:00:00', 90.00, 'High', '400000008', 'Metabolic & Type 2 Diabetes Complication Model', '2026-01-01'),
+(508, '2026-10-19 14:00:00', 60.00, 'High', '400000008', 'Metabolic & Type 2 Diabetes Complication Model', '2026-01-01'),
 (509, '2026-10-29 10:15:00', 20.00, 'Low', '400000009', 'Cancer Risk Triage Model', '2026-01-01'),
 (510, '2026-11-03 16:00:00', 65.00, 'High', '400000010', 'Chronic Respiratory Disease Exacerbation Risk Model', '2026-01-01');
 
@@ -495,9 +497,9 @@ INSERT INTO Notifications (Assessment_Number, Date_Notified, Recipient_User_SSN,
 (501, '2026-08-11 11:05:00', '200000001', 'CRITICAL ALERT: Patient James Wilson assessed as HIGH risk (Score: 80.00) under Cardiovascular Model. Multidisciplinary care plan review required.'),
 (501, '2026-08-11 11:06:00', '100000001', 'PRIORITY TRIAGE: Patient James Wilson requires high-risk care coordination and cardiology follow-up scheduling.'),
 (503, '2026-08-21 15:05:00', '200000003', 'CRITICAL ALERT: Patient Martha Kent assessed as HIGH risk (Score: 70.00) under Cancer Risk Triage Model. Oncology treatment plan and hormone therapy review required.'),
-(506, '2026-09-26 16:35:00', '200000001', 'CRITICAL ALERT: Patient Clark Kent assessed as HIGH risk (Score: 85.00) following acute cardiovascular episode. Urgent physician follow-up required.'),
+(506, '2026-09-26 16:35:00', '200000001', 'CRITICAL ALERT: Patient Clark Kent assessed as HIGH risk (Score: 100.00) following acute cardiovascular episode. Urgent physician follow-up required.'),
 (506, '2026-09-26 16:36:00', '100000001', 'CARE GAP NOTICE: Patient Clark Kent flagged HIGH risk with NO upcoming follow-up appointments scheduled.'),
-(508, '2026-10-19 14:05:00', '200000002', 'CRITICAL ALERT: Patient Tony Stark assessed as HIGH risk (Score: 90.00) for severe Diabetic and Vascular complications. Urgent follow-up required.'),
+(508, '2026-10-19 14:05:00', '200000002', 'CRITICAL ALERT: Patient Tony Stark assessed as HIGH risk (Score: 60.00) for severe Diabetic and Vascular complications. Urgent follow-up required.'),
 (508, '2026-10-19 14:06:00', '100000001', 'CARE GAP NOTICE: Patient Tony Stark has HIGH risk triage level with NO future appointments booked in system.'),
 (510, '2026-11-03 16:05:00', '200000004', 'CRITICAL ALERT: Patient Steve Rogers assessed as HIGH risk (Score: 65.00) for chronic respiratory exacerbation. Pulmonary rehabilitation and inhaler therapy review required.'),
 (510, '2026-11-03 16:06:00', '100000001', 'CARE GAP NOTICE: Patient Steve Rogers flagged HIGH risk with NO upcoming follow-up appointments scheduled.');
