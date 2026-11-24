@@ -73,7 +73,9 @@ ensf-608-ncd-triage/
 │   ├── Logical_Model_Image.png               # Exported Logical Model schema diagram (PNG)
 │   └── Relational_Schema_Logical_Model.md    # Relational Schema with data types, domains & keys
 ├── scripts/
-│   └── DDL.sql                               # Physical SQL database creation & constraints
+│   ├── DDL.sql                               # Physical SQL database creation & constraints
+│   ├── seed.sql                              # Seed data population
+│   └── testing.sql                           # Read-only schema, data, and relationship tests
 └── README.md                                 # Project documentation
 ```
 
@@ -378,3 +380,5 @@ Per the **ENSF 608 Project Description**, the physical implementation and testin
 The database testing suite verifies:
 - **Structural & Constraint Integrity:** Primary key uniqueness, foreign key referential integrity (`ON DELETE` / `ON UPDATE` rules), `UNIQUE` constraints (`Healthcare_Number`, `Employee_Number`, `License_Number`, `Certification_Number`), `NOT NULL` enforcement, and domain `CHECK` constraints (e.g., valid status values and score ranges).
 - **Positive & Negative Test Cases:** Execution evidence demonstrating both valid clinical transactions and proper rejection of invalid or inconsistent data.
+
+Run [`scripts/testing.sql`](scripts/testing.sql) after [`scripts/DDL.sql`](scripts/DDL.sql) and [`scripts/seed.sql`](scripts/seed.sql) to inspect the table count, seed-data counts, clinical joins, integrity checks, and risk-threshold consistency. The testing script is read-only; the DDL script drops and recreates the database, so do not rerun it against data you intend to keep.
