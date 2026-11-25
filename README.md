@@ -75,7 +75,9 @@ ensf-608-ncd-triage/
 ├── scripts/
 │   ├── DDL.sql                               # Physical SQL database creation & constraints
 │   ├── seed.sql                              # Seed data population
-│   └── testing.sql                           # Read-only schema, data, and relationship tests
+│   └── testing.sql                           # Structural, DML, constraint, and query tests
+├── docs/
+│   └── Testing_Results.md                    # Test cases and execution-results record
 └── README.md                                 # Project documentation
 ```
 
@@ -380,5 +382,6 @@ Per the **ENSF 608 Project Description**, the physical implementation and testin
 The database testing suite verifies:
 - **Structural & Constraint Integrity:** Primary key uniqueness, foreign key referential integrity (`ON DELETE` / `ON UPDATE` rules), `UNIQUE` constraints (`Healthcare_Number`, `Employee_Number`, `License_Number`, `Certification_Number`), `NOT NULL` enforcement, and domain `CHECK` constraints (e.g., valid status values and score ranges).
 - **Positive & Negative Test Cases:** Execution evidence demonstrating both valid clinical transactions and proper rejection of invalid or inconsistent data.
+- **DML & Stored Procedures:** Positive `INSERT`, `UPDATE`, and `DELETE` operations run inside a transaction and are rolled back; the two risk-assessment procedures are invoked against seeded data.
 
-Run [`scripts/testing.sql`](scripts/testing.sql) after [`scripts/DDL.sql`](scripts/DDL.sql) and [`scripts/seed.sql`](scripts/seed.sql) to inspect the table count, seed-data counts, clinical joins, integrity checks, and risk-threshold consistency. The testing script is read-only; the DDL script drops and recreates the database, so do not rerun it against data you intend to keep.
+Run [`scripts/testing.sql`](scripts/testing.sql) after [`scripts/DDL.sql`](scripts/DDL.sql) and [`scripts/seed.sql`](scripts/seed.sql) using MySQL 8.0.16 or later. It retains the existing table-count, seed-data, clinical-join, integrity, and risk-threshold queries, then records actual constraint error codes and transactional DML outcomes in a session-only results table. The final result sets show each test's expected outcome, actual MySQL output, and pass/fail status; save those outputs in [`docs/Testing_Results.md`](docs/Testing_Results.md) as execution evidence. The DDL script drops and recreates the database, so do not rerun it against data you intend to keep.

@@ -460,3 +460,34 @@ CREATE TABLE Notifications (
         REFERENCES Users(SSN)
         ON UPDATE CASCADE
 );
+
+DELIMITER //
+
+CREATE PROCEDURE GetPatientRiskAssessments(IN p_patient_ssn CHAR(9))
+BEGIN
+    SELECT
+        Assessment_Number,
+        Assessment_Date,
+        Score,
+        Risk_Level,
+        NCD_Name,
+        Effective_Date
+    FROM Risk_Assessments
+    WHERE Patient_SSN = p_patient_ssn
+    ORDER BY Assessment_Date DESC;
+END//
+
+CREATE PROCEDURE GetHighRiskAssessments()
+BEGIN
+    SELECT
+        Assessment_Number,
+        Patient_SSN,
+        Score,
+        Assessment_Date,
+        NCD_Name
+    FROM Risk_Assessments
+    WHERE Risk_Level = 'High'
+    ORDER BY Score DESC, Assessment_Number;
+END//
+
+DELIMITER ;
