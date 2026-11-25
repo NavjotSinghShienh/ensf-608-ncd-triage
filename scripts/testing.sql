@@ -221,7 +221,7 @@ CREATE TEMPORARY TABLE Testing_Results (
     Expected_Outcome VARCHAR(255) NOT NULL,
     Actual_Output VARCHAR(1000) NOT NULL,
     Pass_Fail VARCHAR(4) NOT NULL
-) ENGINE = MEMORY;
+);
 
 DROP PROCEDURE IF EXISTS Assert_Expected_Error;
 DELIMITER //
@@ -398,7 +398,7 @@ CALL Assert_Expected_Error(
 );
 CALL Assert_Expected_Error(
     'NEG-FK-ROOM', 'Foreign key', 1452,
-    'INSERT INTO Appointments (Appointment_Date, Appointment_Type, Patient_SSN, Doctor_SSN, Admin_SSN, Department_Name, Room_Number) VALUES (''2026-12-01 09:00:00'', ''Follow-Up'', ''400000001'', ''200000001'', ''100000001'', ''Cardiology'', ''NO-SUCH-ROOM'')'
+    'INSERT INTO Appointments (Appointment_Date, Appointment_Type, Patient_SSN, Doctor_SSN, Admin_SSN, Department_Name, Room_Number) VALUES (''2026-12-01 09:00:00'', ''Follow-Up'', ''400000001'', ''200000001'', ''100000001'', ''Cardiology'', ''ZZ99'')'
 );
 
 -- CHECK rejection: expected MySQL error 3819.
@@ -412,7 +412,7 @@ CALL Assert_Expected_Error(
 );
 CALL Assert_Expected_Error(
     'NEG-CHECK-BLOOD-TYPE', 'CHECK', 3819,
-    'INSERT INTO Patients (SSN, Healthcare_Number, Blood_Type) VALUES (''200000001'', ''TEST-HC-INVALID-BLOOD'', ''X+'')'
+    'INSERT INTO Patients (SSN, Healthcare_Number, Blood_Type) VALUES (''200000001'', ''BAD-BLOOD'', ''X+'')'
 );
 CALL Assert_Expected_Error(
     'NEG-CHECK-RANGE', 'CHECK', 3819,
@@ -427,14 +427,22 @@ CALL Assert_Expected_Error(
     'INSERT INTO Appointments (Appointment_Date, Appointment_Type, Status, Patient_SSN, Doctor_SSN, Admin_SSN, Department_Name, Room_Number) VALUES (''2026-12-01 09:00:00'', ''Follow-Up'', ''Booked'', ''400000001'', ''200000001'', ''100000001'', ''Cardiology'', ''A301'')'
 );
 
--- NOT NULL rejection: expected MySQL error 1048.
+-- Omitting mandatory columns is error 1364 in MySQL strict mode.
 CALL Assert_Expected_Error(
-    'NEG-NOT-NULL-EMAIL', 'NOT NULL', 1048,
+    'NEG-MISSING-EMAIL', 'NOT NULL omission', 1364,
     'INSERT INTO Users (SSN, First_Name, Last_Name, DOB, Password) VALUES (''900000003'', ''Missing'', ''Email'', ''2000-01-01'', ''test'')'
 );
 CALL Assert_Expected_Error(
-    'NEG-NOT-NULL-PATIENT', 'NOT NULL', 1048,
+    'NEG-MISSING-PATIENT', 'NOT NULL omission', 1364,
     'INSERT INTO Appointments (Appointment_Date, Appointment_Type, Doctor_SSN, Admin_SSN, Department_Name, Room_Number) VALUES (''2026-12-01 09:00:00'', ''Follow-Up'', ''200000001'', ''100000001'', ''Cardiology'', ''A301'')'
+);
+CALL Assert_Expected_Error(
+    'NEG-NULL-EMAIL', 'NOT NULL', 1048,
+    'INSERT INTO Users (SSN, First_Name, Last_Name, DOB, Email, Password) VALUES (''900000003'', ''Null'', ''Email'', ''2000-01-01'', NULL, ''test'')'
+);
+CALL Assert_Expected_Error(
+    'NEG-NULL-PATIENT', 'NOT NULL', 1048,
+    'INSERT INTO Appointments (Appointment_Date, Appointment_Type, Patient_SSN, Doctor_SSN, Admin_SSN, Department_Name, Room_Number) VALUES (''2026-12-01 09:00:00'', ''Follow-Up'', NULL, ''200000001'', ''100000001'', ''Cardiology'', ''A301'')'
 );
 
 -- ON DELETE rules: a risk-model delete cascades (recorded below), while a
@@ -464,11 +472,8 @@ CALL Assert_Expected_Error(
     'DELETE FROM Doctors WHERE SSN = ''200000001'''
 );
 
-ROLLBACK;
-
-DROP PROCEDURE IF EXISTS Assert_Expected_Error;
-
--- The temporary MEMORY table is not rolled back; review these rows and summary.
+-- Capture the result sets before rollback; the temporary InnoDB table is
+-- transactional, so its rows disappear along with the test data afterward.
 SELECT Test_ID, Category, Expected_Outcome, Actual_Output, Pass_Fail
 FROM Testing_Results
 ORDER BY Test_ID;
@@ -478,3 +483,7 @@ SELECT
     SUM(Pass_Fail = 'PASS') AS Passed,
     SUM(Pass_Fail = 'FAIL') AS Failed
 FROM Testing_Results;
+
+ROLLBACK;
+
+DROP PROCEDURE IF EXISTS Assert_Expected_Error;
