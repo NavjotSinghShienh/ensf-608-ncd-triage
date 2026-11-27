@@ -26,17 +26,30 @@ INSERT INTO Appointments (
     Department_Name,
     Room_Number
 )
-WITH patients_with_care_gap AS (
-    SELECT DISTINCT p.SSN
+WITH latest_assessments AS (
+    SELECT
+        ra.Patient_SSN,
+        ra.NCD_Name,
+        ra.Assessment_Date,
+        ra.Risk_Level,
+        ROW_NUMBER() OVER (
+            PARTITION BY ra.Patient_SSN, ra.NCD_Name
+            ORDER BY ra.Assessment_Date DESC, ra.Assessment_Number DESC
+        ) AS rn
     FROM Risk_Assessments ra
-    JOIN Patients p ON ra.Patient_SSN = p.SSN
+),
+patients_with_care_gap AS (
+    SELECT DISTINCT p.SSN
+    FROM latest_assessments la
+    JOIN Patients p ON la.Patient_SSN = p.SSN
     LEFT JOIN Appointments a
-        ON ra.Patient_SSN = a.Patient_SSN
+        ON la.Patient_SSN = a.Patient_SSN
        AND a.Status = 'Scheduled'
        AND a.Appointment_Date >= CURDATE()
-    WHERE p.Status = 'Active'
-      AND ra.Risk_Level = 'High'
-      AND ra.Assessment_Date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+    WHERE la.rn = 1
+      AND p.Status = 'Active'
+      AND la.Risk_Level = 'High'
+      AND la.Assessment_Date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
       AND a.Appointment_Number IS NULL
 ),
 latest_completed_appt AS (
@@ -363,7 +376,9 @@ SELECT
         WHEN ttr.Operator = '='  THEN CASE WHEN lt.Test_Result =  ttr.Abnormality_Threshold THEN 1 ELSE 0 END
     END AS IsAbnormal
 FROM Lab_Tests lt
-INNER JOIN Test_Threshold_Rules ttr ON lt.Test_Name = ttr.Test_Name;
+INNER JOIN Test_Threshold_Rules ttr ON lt.Test_Name = ttr.Test_Name
+WHERE lt.Status = 'Completed'
+  AND lt.Test_Result IS NOT NULL;
 
 -- J3: Active prescriptions per active patient (5-table INNER JOIN)
 -- Purpose: Provides clinicians with a medication review list showing drug names, doses,
@@ -389,22 +404,38 @@ WHERE u.Status = 'Active'
 -- ============================================================================
 
 -- L1: High-risk care-gap detection (Proposal Q2 / UN SDG 3.4)
--- Purpose: Identifies High-risk patients assessed in the last 6 months who have no future
--- Scheduled follow-up appointment.
+-- Purpose: Identifies active patients whose latest assessment per NCD is High risk within
+-- the last 6 months and who have no future Scheduled follow-up appointment.
+WITH latest_assessments AS (
+    SELECT
+        ra.Patient_SSN,
+        ra.NCD_Name,
+        ra.Assessment_Date,
+        ra.Score,
+        ra.Risk_Level,
+        ROW_NUMBER() OVER (
+            PARTITION BY ra.Patient_SSN, ra.NCD_Name
+            ORDER BY ra.Assessment_Date DESC, ra.Assessment_Number DESC
+        ) AS rn
+    FROM Risk_Assessments ra
+)
 SELECT
     CONCAT(u.First_Name, ' ', u.Last_Name) AS Patient_Name,
-    ra.Assessment_Date,
-    ra.Risk_Level
-FROM Risk_Assessments ra
-JOIN Patients p ON ra.Patient_SSN = p.SSN
+    la.NCD_Name,
+    la.Assessment_Date,
+    la.Score,
+    la.Risk_Level
+FROM latest_assessments la
+JOIN Patients p ON la.Patient_SSN = p.SSN
 JOIN Users u ON p.SSN = u.SSN
 LEFT JOIN Appointments a
-    ON ra.Patient_SSN = a.Patient_SSN
+    ON la.Patient_SSN = a.Patient_SSN
    AND a.Status = 'Scheduled'
    AND a.Appointment_Date >= NOW()
-WHERE p.Status = 'Active'
-  AND ra.Risk_Level = 'High'
-  AND ra.Assessment_Date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+WHERE la.rn = 1
+  AND p.Status = 'Active'
+  AND la.Risk_Level = 'High'
+  AND la.Assessment_Date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
   AND a.Appointment_Number IS NULL;
 
 -- L2: Unassessed patients missing from risk screening
@@ -423,32 +454,40 @@ WHERE ra.Assessment_Number IS NULL;
 -- C1: Facility-level high-risk patient workload (Proposal Q3)
 -- Purpose: Counts distinct active patients whose latest assessment is High risk at each
 -- facility and computes their average risk score (for facilities with > 1 High-risk patient).
-WITH patient_latest_assessments AS (
+WITH patient_latest_ncd_assessments AS (
     SELECT
         p.SSN,
+        ra.NCD_Name,
         ra.Score,
         ra.Risk_Level,
         ROW_NUMBER() OVER (
-            PARTITION BY p.SSN
+            PARTITION BY p.SSN, ra.NCD_Name
             ORDER BY ra.Assessment_Date DESC, ra.Assessment_Number DESC
         ) AS row_num
     FROM Patients p
     INNER JOIN Risk_Assessments ra ON p.SSN = ra.Patient_SSN
     WHERE p.Status = 'Active'
 ),
+high_risk_patients AS (
+    SELECT
+        SSN,
+        MAX(Score) AS Max_High_Score
+    FROM patient_latest_ncd_assessments
+    WHERE row_num = 1
+      AND Risk_Level = 'High'
+    GROUP BY SSN
+),
 patient_appointment_facilities AS (
     SELECT
         f.Facility_Name,
         a.Patient_SSN,
-        hr.Score
+        hr.Max_High_Score AS Score
     FROM Facilities f
     INNER JOIN Departments d ON f.Facility_Name = d.Facility_Name
     INNER JOIN Appointments a ON d.Department_Name = a.Department_Name
-    INNER JOIN patient_latest_assessments hr ON a.Patient_SSN = hr.SSN
+    INNER JOIN high_risk_patients hr ON a.Patient_SSN = hr.SSN
     WHERE a.Status = 'Completed'
-      AND hr.row_num = 1
-      AND hr.Risk_Level = 'High'
-    GROUP BY f.Facility_Name, hr.Score, a.Patient_SSN
+    GROUP BY f.Facility_Name, hr.Max_High_Score, a.Patient_SSN
 )
 SELECT
     Facility_Name,
@@ -520,12 +559,15 @@ SELECT
     COUNT(DISTINCT ap.DIN) AS Number_of_Active_Prescriptions,
     COUNT(DISTINCT atr.Treatment_Code) AS Number_of_Active_Treatments
 FROM patient_risk_summary pr
-INNER JOIN Appointments a ON pr.Patient_SSN = a.Patient_SSN
-INNER JOIN Appointment_Prescriptions ap ON a.Appointment_Number = ap.Appointment_Number
-INNER JOIN Appointment_Treatments atr ON atr.Appointment_Number = a.Appointment_Number
-WHERE a.Status = 'Completed'
-  AND ap.Status = 'Active'
-  AND atr.Status = 'In Progress'
+LEFT JOIN Appointments a
+    ON pr.Patient_SSN = a.Patient_SSN
+   AND a.Status = 'Completed'
+LEFT JOIN Appointment_Prescriptions ap
+    ON a.Appointment_Number = ap.Appointment_Number
+   AND ap.Status = 'Active'
+LEFT JOIN Appointment_Treatments atr
+    ON a.Appointment_Number = atr.Appointment_Number
+   AND atr.Status = 'In Progress'
 GROUP BY
     pr.Doctor_SSN,
     pr.Appointment_Number,
