@@ -1,6 +1,8 @@
-﻿-- Data Population
+﻿-- Database Seed Script
+-- NCD Risk Identification and Triage System (ENSF 608 - Group 6)
 
--- Disable foreign key checks during cleanup if necessary
+USE NCD_Risk_Identification_System;
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 TRUNCATE TABLE Notifications;
@@ -30,478 +32,480 @@ TRUNCATE TABLE Departments;
 TRUNCATE TABLE Facilities;
 
 SET FOREIGN_KEY_CHECKS = 1;
--- =========================================================================
--- 1. FACILITIES (Healthcare Infrastructure)
--- =========================================================================
+
+-- 1. Facilities
 INSERT INTO Facilities (Facility_Name, Facility_Type, Address_Line1, Address_Line2, City, State, Country) VALUES
-('Foothills Medical Centre', 'Hospital', '1403 29 St NW', 'Main Building', 'Calgary', 'Alberta', 'Canada'),
-('Peter Lougheed Centre', 'Hospital', '3500 26 Ave NE', 'Ambulatory Care Wing', 'Calgary', 'Alberta', 'Canada'),
-('Rockyview General Hospital', 'Hospital', '7007 14 St SW', 'South Pavilion', 'Calgary', 'Alberta', 'Canada'),
-('Sheldon M Chumir Health Centre', 'Clinic', '1213 4 St SW', 'Suite 200', 'Calgary', 'Alberta', 'Canada'),
-('Calgary Central Diagnostic Hub', 'Diagnostic Center', '222 5 Ave SW', 'Level 1', 'Calgary', 'Alberta', 'Canada');
+('Foothills Medical Centre',        'Hospital',          '1403 29 St NW',   'Main Building', 'Calgary', 'Alberta', 'Canada'),
+('Peter Lougheed Centre',           'Hospital',          '3500 26 Ave NE',  NULL,            'Calgary', 'Alberta', 'Canada'),
+('Rockyview General Hospital',      'Hospital',          '7007 14 St SW',   'West Wing',     'Calgary', 'Alberta', 'Canada'),
+('South Health Campus',             'Hospital',          '4448 Front St SE',NULL,            'Calgary', 'Alberta', 'Canada'),
+('Sheldon M. Chumir Health Centre', 'Clinic',            '1213 4 St SW',    'Suite 200',     'Calgary', 'Alberta', 'Canada'),
+('Calgary Diagnostic Laboratories', 'Diagnostic Center', '1010 8 Ave SW',   'Floor 4',       'Calgary', 'Alberta', 'Canada');
 
--- =========================================================================
--- 2. DEPARTMENTS  
--- =========================================================================
+-- 2. Departments
 INSERT INTO Departments (Department_Name, Location, Facility_Name) VALUES
-('Cardiology', 'Wing A - 3rd Floor', 'Foothills Medical Centre'),
-('Endocrinology & Diabetes Clinic', 'Wing B - 2nd Floor', 'Peter Lougheed Centre'),
-('Oncology & Cancer Care', 'South Pavilion - 4th Floor', 'Rockyview General Hospital'),
-('Respirology & Chest Care', 'Main Building - 1st Floor', 'Foothills Medical Centre'),
-('General Internal Medicine', 'Suite 201', 'Sheldon M Chumir Health Centre'),
-('Diagnostic Pathology & Laboratory', 'Lower Level Lab Core', 'Calgary Central Diagnostic Hub'),
-('Preventive Medicine & Clinical Triage', 'Wing C - 1st Floor', 'Foothills Medical Centre');
+('Foothills Cardiology',                  'Specialty Services Bldg, Wing C', 'Foothills Medical Centre'),
+('Foothills Endocrinology',               'Main Bldg, 4th Floor',            'Foothills Medical Centre'),
+('Foothills Oncology',                    'Arthur J.E. Child Cancer Centre', 'Foothills Medical Centre'),
+('Peter Lougheed Pulmonology',            'East Clinic Wing, Floor 3',       'Peter Lougheed Centre'),
+('Peter Lougheed Internal Med',           'Ambulatory Wing, Floor 1',        'Peter Lougheed Centre'),
+('Rockyview Cardiology',                  'South Wing, 2nd Floor',           'Rockyview General Hospital'),
+('South Health Chronic Disease',          'Outpatient Pavilion, Floor 2',    'South Health Campus'),
+('Chumir Urgent & Triage Care',           'Ground Level',                    'Sheldon M. Chumir Health Centre'),
+('Calgary Central Diagnostics',           'Central Lab Wing, Room 400',      'Calgary Diagnostic Laboratories'),
+('Preventive Medicine & Clinical Triage', 'Wing C - 1st Floor',              'Foothills Medical Centre');
 
--- =========================================================================
--- 3. ROOMS (Weak Entity of Departments)
--- =========================================================================
+-- 3. Rooms
 INSERT INTO Rooms (Department_Name, Room_Number, Room_Type) VALUES
-('Cardiology', 'A301', 'Consultation'),
-('Cardiology', 'A302', 'Procedure'),
-('Endocrinology & Diabetes Clinic', 'B201', 'Consultation'),
-('Endocrinology & Diabetes Clinic', 'B202', 'Procedure'),
-('Oncology & Cancer Care', 'O401', 'Consultation'),
-('Oncology & Cancer Care', 'O402', 'Procedure'),
-('Respirology & Chest Care', 'R101', 'Consultation'),
-('Respirology & Chest Care', 'R102', 'Procedure'),
-('General Internal Medicine', 'S201', 'Consultation'),
-('General Internal Medicine', 'S202', 'Procedure'),
-('Diagnostic Pathology & Laboratory', 'LAB01', 'Lab'),
-('Diagnostic Pathology & Laboratory', 'LAB02', 'Lab'),
-('Preventive Medicine & Clinical Triage', 'T101', 'Consultation');
+('Foothills Cardiology',         'CARD-101', 'Consultation'),
+('Foothills Cardiology',         'CARD-102', 'Procedure'),
+('Foothills Endocrinology',      'ENDO-201', 'Consultation'),
+('Foothills Oncology',           'ONCO-301', 'Consultation'),
+('Foothills Oncology',           'ONCO-302', 'Procedure'),
+('Peter Lougheed Pulmonology',   'PULM-101', 'Consultation'),
+('Peter Lougheed Pulmonology',   'PULM-102', 'Procedure'),
+('Peter Lougheed Internal Med',  'IMED-105', 'Consultation'),
+('Rockyview Cardiology',         'RCARD-01', 'Consultation'),
+('South Health Chronic Disease', 'SHCD-210', 'Consultation'),
+('Chumir Urgent & Triage Care',  'TRIAGE-1', 'Consultation'),
+('Calgary Central Diagnostics',  'LAB-401',  'Lab'),
+('Calgary Central Diagnostics',  'LAB-402',  'Lab');
 
--- =========================================================================
--- 4. USERS (Supertype for Patients, Health Professionals, and Admins)
--- =========================================================================
+-- 4. Users
 INSERT INTO Users (SSN, First_Name, Last_Name, DOB, Address, Email, Password, Phone_Number, Status) VALUES
--- Administrators
-('100000001', 'Sarah', 'Connor', '1982-04-12', '123 Centre St N, Calgary, AB', 'sarah.connor@albertahealth.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0a', '4035550101', 'Active'),
-('100000002', 'Mark', 'Ruffalo', '1980-09-22', '456 16 Ave NW, Calgary, AB', 'mark.ruffalo@albertahealth.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0b', '4035550102', 'Active'),
-('100000003', 'Elena', 'Gilbert', '1988-06-15', '789 Heritage Dr SW, Calgary, AB', 'elena.gilbert@albertahealth.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0c', '4035550103', 'Active'),
+('100000001', 'David',    'Vanderberg', '1979-09-25', '452 Crestmont Dr SW, Calgary, AB',   'd.vanderberg@ahs.ca',      '$2y$10$e8T7HkG92kLqAdminClin1', '4035550101', 'Active'),
+('100000002', 'Rachel',   'Ngo',        '1990-11-03', '88 University Gate NW, Calgary, AB', 'r.ngo@ahs.ca',             '$2y$10$e8T7HkG92kLqAdminRecep', '4035550102', 'Active'),
+('100000003', 'Marcus',   'Brody',      '1985-02-18', '210 Aspen Stone Blvd, Calgary, AB',  'm.brody@ahs.ca',           '$2y$10$e8T7HkG92kLqAdminSys1',  '4035550103', 'Active'),
+('200000001', 'Alistair', 'Finch',      '1974-06-15', '512 Rideau Rd SW, Calgary, AB',      'a.finch@ahs.ca',           '$2y$10$docPassHashedFinch01',   '4035550201', 'Active'),
+('200000002', 'Elena',    'Rostova',    '1980-08-20', '320 Roxboro Rd SW, Calgary, AB',     'e.rostova@ahs.ca',         '$2y$10$docPassHashedRostova',   '4035550202', 'Active'),
+('200000003', 'Kwame',    'Appiah',     '1977-01-30', '744 Elbow Dr SW, Calgary, AB',       'k.appiah@ahs.ca',          '$2y$10$docPassHashedAppiah',    '4035550203', 'Active'),
+('200000004', 'Mei-Ling', 'Chen',       '1983-12-05', '118 Varsity Estates, Calgary, AB',   'ml.chen@ahs.ca',           '$2y$10$docPassHashedChen04',    '4035550204', 'Active'),
+('200000005', 'Tariq',    'Mansoor',    '1981-05-14', '89 Westwinds Cres NE, Calgary, AB',  't.mansoor@ahs.ca',         '$2y$10$docPassHashedMansoor',   '4035550205', 'Active'),
+('200000006', 'Nadia',    'Patel',      '1976-02-11', '310 Sunridge Way NE, Calgary, AB',   'n.patel@ahs.ca',           '$2y$10$docPassHashedPatel06',   '4035550206', 'Active'),
+('300000001', 'Priya',    'Sharma',     '1991-03-22', '62 Saddletowne Cir NE, Calgary, AB', 'p.sharma@calgarylab.ca',   '$2y$10$labPassPriya001',        '4035550301', 'Active'),
+('300000002', 'Lucas',    'Tremblay',   '1993-07-19', '140 Cranston Way SE, Calgary, AB',   'l.tremblay@calgarylab.ca', '$2y$10$labPassLucas002',        '4035550302', 'Active'),
+('300000003', 'Fatima',   'Zahra',      '1988-10-10', '205 Taralake Way NE, Calgary, AB',   'f.zahra@calgarylab.ca',    '$2y$10$labPassFatima03',        '4035550303', 'Active'),
+('300000004', 'Owen',     'Mercer',     '1984-05-07', '95 Martindale Blvd NE, Calgary, AB', 'o.mercer@calgarylab.ca',   '$2y$10$labPassOwen0004',        '4035550304', 'Inactive'),
+('400000001', 'Arthur',   'Pendleton',  '1955-03-14', '814 1st Ave NW, Calgary, AB',        'arthur.pendleton@shaw.ca', '$2y$10$ptAuthPendleton1',       '4035550401', 'Active'),
+('400000002', 'Beatrice', 'Gomez',      '1962-07-29', '302 Shawville Blvd SE, Calgary, AB', 'bgomez62@telus.net',       '$2y$10$ptAuthGomez0002',        '4035550402', 'Active'),
+('400000003', 'Chloe',    'Desjardins', '1978-11-12', '1520 14th Ave SW, Calgary, AB',      'chloe.desj@gmail.com',     '$2y$10$ptAuthDesjardins',       '4035550403', 'Active'),
+('400000004', 'Devon',    'Blackwood',  '1949-05-03', '904 Heritage Dr SW, Calgary, AB',    'dblackwood49@gmail.com',   '$2y$10$ptAuthBlackwood4',       '4035550404', 'Active'),
+('400000005', 'Evelyn',   'Kowalski',   '1968-09-17', '44 Huntington Park Green, Calgary',  'ekowalski@shaw.ca',        '$2y$10$ptAuthKowalski05',       '4035550405', 'Active'),
+('400000006', 'Farhan',   'Qureshi',    '1973-01-25', '112 Falconridge Dr NE, Calgary, AB', 'farhan.q@hotmail.com',     '$2y$10$ptAuthQureshi006',       '4035550406', 'Active'),
+('400000007', 'Grace',    'MacDonald',  '1985-06-30', '65 Citadel Meadow Close, Calgary',   'grace.macd@gmail.com',     '$2y$10$ptAuthMacDonald7',       '4035550407', 'Active'),
+('400000008', 'Harold',   'Zimmerman',  '1952-12-08', '212 Signal Hill Pt SW, Calgary',     'h.zimmerman@telus.net',    '$2y$10$ptAuthZimmerman8',       '4035550408', 'Active'),
+('400000009', 'Irene',    'O\'Connor',  '1960-04-02', '78 Bridlewood Way SW, Calgary, AB',  'irene.oc@shaw.ca',         '$2y$10$ptAuthOConnor009',       '4035550409', 'Active'),
+('400000010', 'Jamal',    'Hussein',    '1992-08-14', '55 Castleridge Way NE, Calgary, AB', 'jamal.h92@gmail.com',      '$2y$10$ptAuthHussein010',       '4035550410', 'Active'),
+('400000011', 'Clara',    'Benson',     '1958-11-21', '18 Tuscany Valley Rd NW, Calgary',   'c.benson58@telus.net',     '$2y$10$ptAuthBenson011',        '4035550411', 'Inactive'),
+('400000012', 'Walter',   'Houghton',   '1944-01-09', '610 Elbow Dr SW, Calgary, AB',       'w.houghton44@shaw.ca',     '$2y$10$ptAuthHoughton12',       '4035550412', 'Suspended');
 
--- Doctors (Health Professionals)
-('200000001', 'Gregory', 'House', '1975-05-15', '101 University Dr NW, Calgary, AB', 'gregory.house@albertahealth.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0d', '4035550201', 'Active'),
-('200000002', 'Allison', 'Cameron', '1981-11-03', '204 Kensington Rd NW, Calgary, AB', 'allison.cameron@albertahealth.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0e', '4035550202', 'Active'),
-('200000003', 'Robert', 'Chase', '1979-02-12', '309 8 Ave SW, Calgary, AB', 'robert.chase@albertahealth.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0f', '4035550203', 'Active'),
-('200000004', 'Eric', 'Foreman', '1978-08-19', '512 Crowfoot Cres NW, Calgary, AB', 'eric.foreman@albertahealth.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0g', '4035550204', 'Active'),
-('200000005', 'Lisa', 'Cuddy', '1974-03-25', '888 Aspen Woods Dr SW, Calgary, AB', 'lisa.cuddy@albertahealth.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0h', '4035550205', 'Active'),
-
--- Lab Assistants (Health Professionals)
-('300000001', 'Dexter', 'Morgan', '1983-02-01', '710 Memorial Dr NE, Calgary, AB', 'dexter.morgan@albertahealth.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0i', '4035550301', 'Active'),
-('300000002', 'Abby', 'Sciuto', '1986-07-27', '920 17 Ave SW, Calgary, AB', 'abby.sciuto@albertahealth.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0j', '4035550302', 'Active'),
-('300000003', 'Walter', 'Bishop', '1965-10-18', '431 Sunridge Way NE, Calgary, AB', 'walter.bishop@albertahealth.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0k', '4035550303', 'Active'),
-
--- Patients
-('400000001', 'James', 'Wilson', '1958-03-10', '140 Cranston Dr SE, Calgary, AB', 'james.wilson@patients.ab.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0l', '4035550401', 'Active'),
-('400000002', 'Arthur', 'Dent', '1966-07-11', '221B Baker Park NW, Calgary, AB', 'arthur.dent@patients.ab.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0m', '4035550402', 'Active'),
-('400000003', 'Martha', 'Kent', '1952-12-05', '314 Country Hills Blvd NW, Calgary, AB', 'martha.kent@patients.ab.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0n', '4035550403', 'Active'),
-('400000004', 'Bruce', 'Wayne', '1973-04-17', '100 Shawnessy Blvd SW, Calgary, AB', 'bruce.wayne@patients.ab.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0o', '4035550404', 'Active'),
-('400000005', 'Diana', 'Prince', '1985-09-08', '505 Quarry Park Blvd SE, Calgary, AB', 'diana.prince@patients.ab.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0p', '4035550405', 'Active'),
-('400000006', 'Clark', 'Kent', '1962-06-18', '77 Prairie Springs Dr, Calgary, AB', 'clark.kent@patients.ab.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0q', '4035550406', 'Active'),
-('400000007', 'Peter', 'Parker', '1995-08-10', '12 Taradale Dr NE, Calgary, AB', 'peter.parker@patients.ab.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0r', '4035550407', 'Active'),
-('400000008', 'Tony', 'Stark', '1960-05-29', '88 Elbow Dr SW, Calgary, AB', 'tony.stark@patients.ab.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0s', '4035550408', 'Active'),
-('400000009', 'Natasha', 'Romanoff', '1984-11-22', '310 Bridgeland Ave NE, Calgary, AB', 'natasha.romanoff@patients.ab.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0t', '4035550409', 'Active'),
-('400000010', 'Steve', 'Rogers', '1950-07-04', '420 Signal Hill Dr SW, Calgary, AB', 'steve.rogers@patients.ab.ca', '$2b$12$e8Y6l8m4R1N5d8e7h2w.3O8w8q1v8z0u', '4035550410', 'Active');
-
--- =========================================================================
--- 5. PATIENTS
--- =========================================================================
+-- 5. Patients
 INSERT INTO Patients (SSN, Healthcare_Number, Gender, Blood_Type, Status) VALUES
-('400000001', 'AB-908123401', 'Male', 'O+', 'Active'),
-('400000002', 'AB-908123402', 'Male', 'A+', 'Active'),
-('400000003', 'AB-908123403', 'Female', 'B+', 'Active'),
-('400000004', 'AB-908123404', 'Male', 'O-', 'Active'),
-('400000005', 'AB-908123405', 'Female', 'AB+', 'Active'),
-('400000006', 'AB-908123406', 'Male', 'A-', 'Active'),
-('400000007', 'AB-908123407', 'Male', 'O+', 'Active'),
-('400000008', 'AB-908123408', 'Male', 'B-', 'Active'),
-('400000009', 'AB-908123409', 'Female', 'AB-', 'Active'),
-('400000010', 'AB-908123410', 'Male', 'O+', 'Active');
+('400000001', 'AB-904812301', 'Male',   'O+',  'Active'),
+('400000002', 'AB-904812302', 'Female', 'A+',  'Active'),
+('400000003', 'AB-904812303', 'Female', 'B-',  'Active'),
+('400000004', 'AB-904812304', 'Male',   'A-',  'Active'),
+('400000005', 'AB-904812305', 'Female', 'O-',  'Active'),
+('400000006', 'AB-904812306', 'Male',   'AB+', 'Active'),
+('400000007', 'AB-904812307', 'Female', 'A+',  'Active'),
+('400000008', 'AB-904812308', 'Male',   'B+',  'Active'),
+('400000009', 'AB-904812309', 'Female', 'O+',  'Active'),
+('400000010', 'AB-904812310', 'Male',   'AB-', 'Active'),
+('400000011', 'AB-904812311', 'Female', 'A+',  'Inactive'),
+('400000012', 'AB-904812312', 'Male',   'O-',  'Deceased');
 
--- =========================================================================
--- 6. PATIENT EMERGENCY CONTACTS (Multivalued Attribute)
--- =========================================================================
+-- 6. Patient Emergency Contacts
 INSERT INTO Patient_Emergency_Contacts (Patient_SSN, Contact_Name, Contact_Phone_Number) VALUES
-('400000001', 'Julie Wilson', '4035559001'),
-('400000002', 'Trillian Astra', '4035559002'),
-('400000003', 'Jonathan Kent', '4035559003'),
-('400000004', 'Alfred Pennyworth', '4035559004'),
-('400000005', 'Hippolyta Prince', '4035559005'),
-('400000006', 'Lois Lane-Kent', '4035559006'),
-('400000007', 'May Parker', '4035559007'),
-('400000008', 'Pepper Potts', '4035559008'),
-('400000009', 'Clint Barton', '4035559009'),
-('400000010', 'Bucky Barnes', '4035559010');
+('400000001', 'Mary Pendleton',    '4035558801'),
+('400000001', 'Mary Pendleton',    '4035558899'),
+('400000002', 'Carlos Gomez',      '4035558802'),
+('400000002', 'Elena Gomez',       '4035558802'),
+('400000003', 'Marc Desjardins',   '4035558803'),
+('400000004', 'Judith Blackwood',  '4035558804'),
+('400000005', 'Stan Kowalski',     '4035558805'),
+('400000006', 'Amina Qureshi',     '4035558806'),
+('400000007', 'Colin MacDonald',   '4035558807'),
+('400000008', 'Ruth Zimmerman',    '4035558808'),
+('400000009', 'Patrick O\'Connor', '4035558809'),
+('400000010', 'Yasmin Hussein',    '4035558810'),
+('400000011', 'Thomas Benson',     '4035558811');
 
--- =========================================================================
--- 7. HEALTH PROFESSIONALS (Supertype for Doctors and Lab Assistants)
-
--- =========================================================================
+-- 7. Health Professionals
 INSERT INTO Health_Professionals (SSN, Employee_Number, Employment_Date, Status, Department_Name) VALUES
-('200000001', 'EMP-DOC-001', '2010-07-01', 'Active', 'Cardiology'),
-('200000002', 'EMP-DOC-002', '2014-03-15', 'Active', 'Endocrinology & Diabetes Clinic'),
-('200000003', 'EMP-DOC-003', '2016-09-01', 'Active', 'Oncology & Cancer Care'),
-('200000004', 'EMP-DOC-004', '2012-11-20', 'Active', 'Respirology & Chest Care'),
-('200000005', 'EMP-DOC-005', '2008-01-10', 'Active', 'General Internal Medicine'),
-('300000001', 'EMP-LAB-001', '2015-06-01', 'Active', 'Diagnostic Pathology & Laboratory'),
-('300000002', 'EMP-LAB-002', '2018-04-12', 'Active', 'Diagnostic Pathology & Laboratory'),
-('300000003', 'EMP-LAB-003', '2011-10-05', 'Active', 'Diagnostic Pathology & Laboratory');
+('200000001', 'EMP-CARD-001', '2010-07-01', 'Active',     'Foothills Cardiology'),
+('200000002', 'EMP-ENDO-002', '2014-01-15', 'Active',     'Foothills Endocrinology'),
+('200000003', 'EMP-ONCO-003', '2012-09-01', 'Active',     'Foothills Oncology'),
+('200000004', 'EMP-PULM-004', '2018-04-10', 'Active',     'Peter Lougheed Pulmonology'),
+('200000005', 'EMP-IMED-005', '2016-11-20', 'Active',     'Peter Lougheed Internal Med'),
+('200000006', 'EMP-CARD-006', '2015-03-01', 'On Leave',   'Foothills Cardiology'),
+('300000001', 'EMP-LAB-101',  '2019-02-01', 'Active',     'Calgary Central Diagnostics'),
+('300000002', 'EMP-LAB-102',  '2021-06-15', 'Active',     'Calgary Central Diagnostics'),
+('300000003', 'EMP-LAB-103',  '2017-08-25', 'Active',     'Calgary Central Diagnostics'),
+('300000004', 'EMP-LAB-104',  '2016-05-10', 'Terminated', 'Calgary Central Diagnostics');
 
--- =========================================================================
--- 8. DOCTORS (Subtype of Health Professionals)
--- =========================================================================
+-- 8. Doctors
 INSERT INTO Doctors (SSN, License_Number, Speciality, Qualification) VALUES
-('200000001', 'CPSA-MD-78101', 'Cardiovascular Diseases', 'MD, FRCPC Cardiology'),
-('200000002', 'CPSA-MD-78102', 'Endocrinology & Metabolism', 'MD, FRCPC Endocrinology'),
-('200000003', 'CPSA-MD-78103', 'Medical Oncology', 'MD, FRCPC Medical Oncology'),
-('200000004', 'CPSA-MD-78104', 'Pulmonary & Critical Care', 'MD, FRCPC Respirology'),
-('200000005', 'CPSA-MD-78105', 'Internal Medicine & Triage', 'MD, FACP Internal Medicine');
+('200000001', 'CPSA-MD-11820', 'Cardiology',        'MD, FRCPC (Cardiovascular Disease)'),
+('200000002', 'CPSA-MD-14592', 'Endocrinology',     'MD, FRCPC (Endocrinology & Metabolism)'),
+('200000003', 'CPSA-MD-09841', 'Medical Oncology',  'MBChB, FRCPC (Medical Oncology)'),
+('200000004', 'CPSA-MD-22019', 'Respirology',       'MD, FRCPC (Adult Respirology)'),
+('200000005', 'CPSA-MD-17844', 'Internal Medicine', 'MD, FACP, FRCPC (General Internal Medicine)'),
+('200000006', 'CPSA-MD-30112', 'Cardiology',        'MD, FRCPC (Preventive Cardiology)');
 
--- =========================================================================
--- 9. LAB ASSISTANTS (Subtype of Health Professionals)
--- =========================================================================
+-- 9. Lab Assistants
 INSERT INTO Lab_Assistants (SSN, Certification_Number, Certification_Type, Lab_Specialization) VALUES
-('300000001', 'CSMLS-MLT-4101', 'Certified Medical Laboratory Technologist', 'Clinical Biochemistry & Hematology'),
-('300000002', 'CSMLS-MLT-4102', 'Certified Medical Laboratory Technologist', 'Clinical Chemistry & Molecular Diagnostics'),
-('300000003', 'CSMLS-MLT-4103', 'Senior Laboratory Technologist', 'Immunology & Toxicology');
+('300000001', 'CSMLS-MLT-88201', 'CSMLS Registered MLT', 'Clinical Biochemistry & Lipid Panels'),
+('300000002', 'CSMLS-MLT-90412', 'CSMLS Registered MLT', 'Pulmonary Function & Blood Gas Analysis'),
+('300000003', 'CSMLS-MLT-76344', 'CSMLS Registered MLT', 'Oncology Biomarkers & Immunoassays'),
+('300000004', 'CSMLS-MLT-99104', 'CSMLS Registered MLT', 'Hematology & Routine Urinalysis');
 
--- =========================================================================
--- 10. ADMINS (Administrative Roles)
--- =========================================================================
+-- 10. Admins
 INSERT INTO Admins (SSN, Role, IsActive, Department_Name) VALUES
 ('100000001', 'Clinical Admin', TRUE, 'Preventive Medicine & Clinical Triage'),
-('100000002', 'Receptionist', TRUE, 'Cardiology'),
-('100000003', 'System Admin', TRUE, 'Diagnostic Pathology & Laboratory');
+('100000002', 'Receptionist',   TRUE, 'Preventive Medicine & Clinical Triage'),
+('100000003', 'System Admin',   TRUE, 'Preventive Medicine & Clinical Triage');
 
--- =========================================================================
--- 11. TREATMENT TYPES 
--- =========================================================================
+-- 11. Treatment Types
 INSERT INTO Treatment_Types (Treatment_Code, Treatment_Name, Treatment_Category) VALUES
-('TR-LIF-001', 'Therapeutic Lifestyle Modification & Dietary Counseling', 'Lifestyle Intervention'),
-('TR-LIF-002', 'Supervised Cardiovascular Exercise & Rehabilitation', 'Lifestyle Intervention'),
-('TR-LIF-003', 'Smoking Cessation Program', 'Lifestyle Intervention'),
-('TR-THE-001', 'Inhaler Therapy Initiation and Review', 'Therapy'),
-('TR-THE-002', 'Comprehensive Diabetic Foot Ulcer Therapy & Wound Care', 'Therapy'),
-('TR-THE-003', 'Pulmonary Rehabilitation', 'Therapy'),
-('TR-THE-004', 'Chemotherapy', 'Therapy'),
-('TR-THE-005', 'Radiation Therapy', 'Therapy'),
-('TR-THE-006', 'Hormone (Endocrine) Therapy for Breast Cancer', 'Therapy'),
-('TR-SUR-001', 'Percutaneous Coronary Intervention / Angioplasty', 'Surgical'),
-('TR-SUR-002', 'Breast Cancer Surgery (Lumpectomy or Mastectomy)', 'Surgical'),
-('TR-MON-001', 'Ambulatory 24-Hour Blood Pressure Monitoring Protocol', 'Monitoring'),
-('TR-MON-002', 'Continuous Glucose Monitoring (CGM) Real-Time Profiling', 'Monitoring'),
-('TR-MON-003', 'Spirometry and Pulmonary Function Monitoring', 'Monitoring'),
-('TR-MON-004', 'Cancer Screening and Surveillance', 'Monitoring');
+('TX-LFS-01', 'Medical Nutrition Therapy & Low-Sodium Diet',   'Lifestyle Intervention'),
+('TX-LFS-02', 'Structured Smoking Cessation Counseling',       'Lifestyle Intervention'),
+('TX-LFS-03', 'Supervised Exercise & Cardiac Rehab Plan',      'Lifestyle Intervention'),
+('TX-THP-01', 'Pulmonary Rehabilitation & Breathing Therapy',  'Therapy'),
+('TX-THP-02', 'Targeted Systemic Chemotherapy',                'Therapy'),
+('TX-THP-03', 'Adjuvant Radiation Therapy',                    'Therapy'),
+('TX-THP-04', 'Inhaler Therapy Initiation & Technique Review', 'Therapy'),
+('TX-SRG-01', 'Percutaneous Coronary Intervention (Stent)',    'Surgical'),
+('TX-SRG-02', 'Oncological Tumor Resection Surgery',           'Surgical'),
+('TX-DIA-01', 'Supportive Renal Replacement Dialysis',         'Dialysis'),
+('TX-MON-01', 'Continuous Ambulatory Blood Pressure Mon.',     'Monitoring'),
+('TX-MON-02', 'Continuous Glucose Monitoring (CGM) Review',    'Monitoring'),
+('TX-MON-03', 'Serial Low-Dose CT Oncology Surveillance',      'Monitoring'),
+('TX-MON-04', 'Spirometry & Pulmonary Function Monitoring',    'Monitoring');
 
--- =========================================================================
--- 12. MEDICATIONS (real Health Canada DINs; keep DINs as quoted strings)
--- =========================================================================
+-- 12. Medications
 INSERT INTO Medications (DIN, Generic_Name, Brand_Name) VALUES
 ('02099233', 'Metformin hydrochloride 500 mg',               'Glucophage'),
 ('02443937', 'Empagliflozin 10 mg',                          'Jardiance'),
-('02443945', 'Empagliflozin 25 mg',                          'Jardiance'),
 ('02294338', 'Insulin glargine 100 units/mL (SoloStar pen)', 'Lantus'),
+('02221853', 'Ramipril 10 mg',                               'Altace'),
 ('02230713', 'Atorvastatin calcium 20 mg',                   'Lipitor'),
 ('02247162', 'Rosuvastatin calcium 10 mg',                   'Crestor'),
-('02221853', 'Ramipril 10 mg',                               'Altace'),
 ('00878928', 'Amlodipine besylate 5 mg',                     'Norvasc'),
 ('02241497', 'Salbutamol sulfate 100 mcg/actuation inhaler', 'Ventolin HFA'),
-('02245386', 'Budesonide/formoterol 200/6 mcg inhalation powder', 'Symbicort 200 Turbuhaler'),
-('02435381', 'Tiotropium 2.5 mcg/actuation inhalation solution',  'Spiriva Respimat'),
-('02224135', 'Anastrozole 1 mg',                             'Arimidex');
+('02245386', 'Budesonide/formoterol 200/6 mcg inhalation',   'Symbicort'),
+('02435381', 'Tiotropium 2.5 mcg/actuation inhalation',      'Spiriva Respimat'),
+('02404589', 'Capecitabine 500 mg',                          'Xeloda'),
+('02048483', 'Tamoxifen citrate 20 mg',                      'Nolvadex-D');
 
--- =========================================================================
--- 13. TEST TYPES 
--- =========================================================================
+-- 13. Test Types
 INSERT INTO Test_Types (Test_Name, Min_Range, Max_Range, Admin_SSN) VALUES
-('Glycated Hemoglobin (HbA1c)', 4.00, 6.00, '100000001'),
-('Fasting Blood Glucose', 3.30, 6.00, '100000001'),
-('Total Cholesterol', 3.00, 5.20, '100000001'),
-('Low-Density Lipoprotein (LDL-C)', 1.50, 3.40, '100000001'),
-('High-Density Lipoprotein (HDL-C)', 1.00, 2.20, '100000001'),
-('High-Sensitivity C-Reactive Protein (hs-CRP)', 0.00, 3.00, '100000003'),
-('Systolic Blood Pressure (Clinical)', 90.00, 120.00, '100000001'),
-('Body Mass Index (BMI)', 18.50, 24.90, '100000001'),
-('CA 15-3 (Breast Cancer Marker)', 0.00, 30.00, '100000001'),
-('Carcinoembryonic Antigen (CEA)', 0.00, 5.00, '100000001'),
-('Prostate-Specific Antigen (PSA)', 0.00, 4.00, '100000001'),
-('FEV1 (% Predicted)', 80.00, 120.00, '100000001'),
-('FEV1/FVC Ratio', 0.70, 1.00, '100000001');
+('Systolic Blood Pressure',                     90.00, 120.00, '100000001'),
+('Diastolic Blood Pressure',                    60.00,  80.00, '100000001'),
+('Low-Density Lipoprotein (LDL-C)',              1.50,   3.30, '100000001'),
+('High-Density Lipoprotein (HDL-C)',             1.00,   2.20, '100000001'),
+('Total Cholesterol',                            3.00,   5.20, '100000001'),
+('High-Sensitivity C-Reactive Protein (hs-CRP)', 0.00,   3.00, '100000001'),
+('Fasting Blood Glucose',                        3.90,   5.60, '100000001'),
+('Hemoglobin A1c (HbA1c)',                       4.00,   5.60, '100000001'),
+('Body Mass Index (BMI)',                       18.50,  24.90, '100000001'),
+('FEV1/FVC Ratio',                               0.70,   0.85, '100000001'),
+('FEV1 (% Predicted)',                          80.00, 120.00, '100000001'),
+('Carcinoembryonic Antigen (CEA)',               0.00,   3.00, '100000001'),
+('Prostate-Specific Antigen (PSA)',              0.00,   4.00, '100000001'),
+('CA 19-9 Tumor Antigen',                        0.00,  37.00, '100000001');
 
--- =========================================================================
--- 14. MEDICAL CONDITIONS 
---     Categories must match CK_Medical_Conditions_Category
--- =========================================================================
+-- 14. Medical Conditions (ICD-10)
 INSERT INTO Medical_Conditions (ICD_Code, Condition_Name, Category) VALUES
-('I10', 'Essential (Primary) Hypertension', 'Cardiovascular'),
-('I25.1', 'Atherosclerotic Heart Disease of Native Coronary Artery', 'Cardiovascular'),
-('I50.9', 'Heart Failure, Unspecified', 'Cardiovascular'),
-('E11.9', 'Type 2 Diabetes Mellitus without Complications', 'Metabolic'),
-('E78.0', 'Pure Hypercholesterolemia', 'Metabolic'),
-('E66.0', 'Obesity due to Excess Calories', 'Lifestyle'),
-('J44.9', 'Chronic Obstructive Pulmonary Disease (COPD), Unspecified', 'Respiratory'),
-('J45.9', 'Asthma, Unspecified', 'Respiratory'),
-('C50.9', 'Malignant Neoplasm of Breast, Unspecified', 'Oncological'),
-('C61', 'Malignant Neoplasm of Prostate', 'Oncological'),
-('C34.9', 'Malignant Neoplasm of Bronchus or Lung, Unspecified', 'Oncological'),
-('C18.9', 'Malignant Neoplasm of Colon, Unspecified', 'Oncological'),
-('Z82.49', 'Family History of Ischemic Heart Disease and Other Diseases of Circulatory System', 'Family History'),
-('Z80.3', 'Family History of Malignant Neoplasm of Breast', 'Family History');
+('I10',    'Essential (Primary) Hypertension',                          'Cardiovascular'),
+('I25.10', 'Atherosclerotic Heart Disease of Native Coronary Artery',   'Cardiovascular'),
+('I48.91', 'Unspecified Atrial Fibrillation',                           'Cardiovascular'),
+('I50.9',  'Heart Failure, Unspecified',                                'Cardiovascular'),
+('C34.90', 'Malignant Neoplasm of Bronchus and Lung',                   'Oncological'),
+('C18.9',  'Malignant Neoplasm of Colon, Unspecified',                  'Oncological'),
+('C50.91', 'Malignant Neoplasm of Breast, Unspecified',                 'Oncological'),
+('E11.9',  'Type 2 Diabetes Mellitus without Complications',            'Metabolic'),
+('E78.5',  'Hyperlipidemia, Unspecified',                               'Metabolic'),
+('E66.9',  'Obesity, Unspecified',                                      'Metabolic'),
+('J44.9',  'Chronic Obstructive Pulmonary Disease (COPD), Unspecified', 'Respiratory'),
+('J45.90', 'Unspecified Asthma, Uncomplicated',                         'Respiratory'),
+('Z72.0',  'Tobacco Use (Current Cigarette Smoker)',                    'Lifestyle'),
+('Z72.3',  'Lack of Physical Exercise (Sedentary Lifestyle)',           'Lifestyle'),
+('Z72.4',  'Inappropriate Diet and Eating Habits',                      'Lifestyle'),
+('Z82.49', 'Family History of Ischemic Heart Disease',                  'Family History'),
+('Z83.3',  'Family History of Diabetes Mellitus',                       'Family History'),
+('Z80.9',  'Family History of Malignant Neoplasm (Cancer)',             'Family History'),
+('Z82.3',  'Family History of Stroke / Cerebrovascular Disease',        'Family History');
 
--- =========================================================================
--- 15. APPOINTMENTS (Clinical Consultations & Triage Visits)
--- =========================================================================
-INSERT INTO Appointments (Appointment_Number, Appointment_Date, Appointment_Type, Status, Patient_SSN, Doctor_SSN, Admin_SSN, Department_Name, Room_Number) VALUES
-(101, '2026-08-10 09:00:00', 'Initial Consultation', 'Completed', '400000001', '200000001', '100000002', 'Cardiology', 'A301'),
-(102, '2026-08-15 10:30:00', 'Initial Consultation', 'Completed', '400000002', '200000002', '100000001', 'Endocrinology & Diabetes Clinic', 'B201'),
-(103, '2026-08-20 14:00:00', 'Initial Consultation', 'Completed', '400000003', '200000003', '100000001', 'Oncology & Cancer Care', 'O401'),
-(104, '2026-09-05 11:00:00', 'Initial Consultation', 'Completed', '400000004', '200000001', '100000002', 'Cardiology', 'A301'),
-(105, '2026-09-12 13:30:00', 'Routine Checkup', 'Completed', '400000005', '200000005', '100000001', 'General Internal Medicine', 'S201'),
-(106, '2026-09-25 15:00:00', 'Emergency', 'Completed', '400000006', '200000001', '100000002', 'Cardiology', 'A302'),
-(107, '2026-10-02 09:30:00', 'Initial Consultation', 'Completed', '400000007', '200000004', '100000001', 'Respirology & Chest Care', 'R101'),
-(108, '2026-10-18 10:00:00', 'Follow-Up', 'Completed', '400000008', '200000002', '100000001', 'Endocrinology & Diabetes Clinic', 'B201'),
-(109, '2026-10-28 11:30:00', 'Routine Checkup', 'Completed', '400000009', '200000005', '100000001', 'General Internal Medicine', 'S201'),
-(110, '2026-11-02 14:30:00', 'Follow-Up', 'Completed', '400000010', '200000004', '100000001', 'Respirology & Chest Care', 'R101'),
--- Future Scheduled Appointments (for care gap analysis: Patients 400000001 and 400000003 have follow-ups; 400000006, 400000008 and 400000010 are HIGH risk with no future visits!)
-(111, '2026-11-20 09:00:00', 'Follow-Up', 'Scheduled', '400000001', '200000001', '100000002', 'Cardiology', 'A301'),
-(112, '2026-11-22 10:30:00', 'Follow-Up', 'Scheduled', '400000002', '200000002', '100000001', 'Endocrinology & Diabetes Clinic', 'B201'),
-(113, '2026-11-25 13:00:00', 'Follow-Up', 'Scheduled', '400000003', '200000003', '100000001', 'Oncology & Cancer Care', 'O401'),
-(114, '2026-12-05 14:00:00', 'Routine Checkup', 'Scheduled', '400000005', '200000005', '100000001', 'General Internal Medicine', 'S201');
-
--- =========================================================================
--- 16. APPOINTMENT TREATMENTS
--- =========================================================================
-INSERT INTO Appointment_Treatments (Appointment_Number, Treatment_Code, Treatment_Date, Status) VALUES
-(101, 'TR-LIF-002', '2026-08-10', 'Completed'),
-(101, 'TR-MON-001', '2026-08-11', 'Completed'),
-(102, 'TR-LIF-001', '2026-08-15', 'Completed'),
-(102, 'TR-MON-002', '2026-08-15', 'Completed'),
--- Cancer (breast): screening, surgery, radiation, hormone therapy
-(103, 'TR-MON-004', '2026-08-20', 'Completed'),
-(103, 'TR-SUR-002', '2026-09-10', 'Completed'),
-(103, 'TR-THE-006', '2026-09-24', 'In Progress'),
-(103, 'TR-THE-005', '2026-10-01', 'In Progress'),
-(104, 'TR-SUR-001', '2026-09-08', 'Completed'),
-(105, 'TR-LIF-001', '2026-09-12', 'Completed'),
-(106, 'TR-SUR-001', '2026-09-25', 'Completed'),
--- Chronic respiratory disease (asthma)
-(107, 'TR-THE-001', '2026-10-02', 'In Progress'),
-(107, 'TR-MON-003', '2026-10-02', 'Completed'),
-(108, 'TR-THE-002', '2026-10-18', 'Completed'),
-(109, 'TR-MON-004', '2026-10-28', 'Completed'),
--- Chronic respiratory disease (COPD)
-(110, 'TR-MON-003', '2026-11-02', 'Completed'),
-(110, 'TR-THE-003', '2026-11-02', 'In Progress'),
-(110, 'TR-LIF-003', '2026-11-02', 'In Progress'),
-(111, 'TR-LIF-002', '2026-11-20', 'Recommended');
-
--- =========================================================================
--- 17. APPOINTMENT PRESCRIPTIONS (real DINs from Section 12)
--- =========================================================================
-INSERT INTO Appointment_Prescriptions (Appointment_Number, DIN, Dose, Instruction, Status) VALUES
-(101, '02221853', '10 mg', 'Take 1 capsule daily every morning for hypertension', 'Active'),
-(101, '02230713', '20 mg', 'Take 1 tablet at bedtime for hypercholesterolemia', 'Active'),
-(102, '02099233', '500 mg', 'Take 1 tablet twice daily with meals for blood glucose control', 'Active'),
-(102, '02443937', '10 mg', 'Take 1 tablet every morning', 'Active'),
-(103, '02224135', '1 mg', 'Take 1 tablet by mouth once daily; usually continued for 5 years', 'Active'),
-(103, '00878928', '5 mg', 'Take 1 tablet daily for blood pressure reduction', 'Active'),
-(104, '02247162', '10 mg', 'Take 1 tablet daily in the evening post-PCI', 'Active'),
-(106, '02221853', '10 mg', 'Take 1 capsule daily for heart failure and blood pressure control', 'Active'),
-(106, '02443937', '10 mg', 'Take 1 tablet every morning', 'Active'),
-(107, '02245386', '1-2 inhalations (200/6 mcg)', 'Inhale 1 to 2 times daily as directed; rinse mouth after use', 'Active'),
-(107, '02241497', '1-2 puffs (100 mcg each)', 'Inhale as needed for wheeze or shortness of breath; maximum 8 puffs per day', 'Active'),
-(108, '02443945', '25 mg', 'Take 1 tablet every morning', 'Active'),
-(108, '02099233', '1000 mg (2 x 500 mg)', 'Take 2 tablets twice daily with meals', 'Active'),
-(108, '02294338', '10 units', 'Inject under the skin once daily at the same time each day', 'Active'),
-(110, '02435381', '2 inhalations (2.5 mcg each)', 'Inhale 2 puffs once daily with the Respimat inhaler', 'Active'),
-(110, '02241497', '1-2 puffs (100 mcg each)', 'Inhale as needed for shortness of breath; maximum 8 puffs per day', 'Active');
-
--- =========================================================================
--- 18. LAB TESTS 
--- =========================================================================
-INSERT INTO Lab_Tests (Accession_Number, Test_Date, Test_Result, Status, Appointment_Number, Lab_Assistant_SSN, Test_Name) VALUES
-('ACC-2026-0001', '2026-08-11', 158.00, 'Completed', 101, '300000001', 'Systolic Blood Pressure (Clinical)'),
-('ACC-2026-0002', '2026-08-11', 4.10, 'Completed', 101, '300000001', 'Low-Density Lipoprotein (LDL-C)'),
-('ACC-2026-0003', '2026-08-11', 6.20, 'Completed', 101, '300000002', 'Total Cholesterol'),
-('ACC-2026-0004', '2026-08-16', 8.90, 'Completed', 102, '300000002', 'Glycated Hemoglobin (HbA1c)'),
-('ACC-2026-0005', '2026-08-16', 9.80, 'Completed', 102, '300000001', 'Fasting Blood Glucose'),
-('ACC-2026-0006', '2026-08-21', 62.00, 'Completed', 103, '300000003', 'CA 15-3 (Breast Cancer Marker)'),
-('ACC-2026-0007', '2026-08-21', 6.80, 'Completed', 103, '300000002', 'Carcinoembryonic Antigen (CEA)'),
-('ACC-2026-0008', '2026-09-06', 4.80, 'Completed', 104, '300000001', 'High-Sensitivity C-Reactive Protein (hs-CRP)'),
-('ACC-2026-0009', '2026-09-06', 3.90, 'Completed', 104, '300000002', 'Low-Density Lipoprotein (LDL-C)'),
-('ACC-2026-0010', '2026-09-13', 23.40, 'Completed', 105, '300000002', 'Body Mass Index (BMI)'),
-('ACC-2026-0011', '2026-09-26', 172.00, 'Completed', 106, '300000001', 'Systolic Blood Pressure (Clinical)'),
-('ACC-2026-0012', '2026-09-26', 7.50, 'Completed', 106, '300000003', 'High-Sensitivity C-Reactive Protein (hs-CRP)'),
-('ACC-2026-0013', '2026-10-03', 27.80, 'Completed', 107, '300000002', 'Body Mass Index (BMI)'),
-('ACC-2026-0014', '2026-10-03', 0.68, 'Completed', 107, '300000002', 'FEV1/FVC Ratio'),
-('ACC-2026-0015', '2026-10-03', 78.00, 'Completed', 107, '300000002', 'FEV1 (% Predicted)'),
-('ACC-2026-0016', '2026-10-19', 9.50, 'Completed', 108, '300000001', 'Glycated Hemoglobin (HbA1c)'),
-('ACC-2026-0017', '2026-10-19', 11.20, 'Completed', 108, '300000002', 'Fasting Blood Glucose'),
-('ACC-2026-0018', '2026-10-29', 32.10, 'Completed', 109, '300000002', 'Body Mass Index (BMI)'),
-('ACC-2026-0019', '2026-10-29', 18.00, 'Completed', 109, '300000003', 'CA 15-3 (Breast Cancer Marker)'),
-('ACC-2026-0020', '2026-11-03', 0.54, 'Completed', 110, '300000003', 'FEV1/FVC Ratio'),
-('ACC-2026-0021', '2026-11-03', 42.00, 'Completed', 110, '300000003', 'FEV1 (% Predicted)');
-
--- =========================================================================
--- 19. PATIENT DIAGNOSES
--- =========================================================================
-INSERT INTO Patient_Diagnoses (Patient_SSN, ICD_Code, Diagnosis_Date, Status) VALUES
--- Patient 400000001 (James Wilson): Cardiovascular, multiple conditions -> High Risk
-('400000001', 'I10', '2021-03-15', 'Chronic'),
-('400000001', 'I25.1', '2023-07-20', 'Chronic'),
-('400000001', 'E78.0', '2021-03-15', 'Active'),
-
--- Patient 400000002 (Arthur Dent): Diabetes & Obesity -> Medium Risk
-('400000002', 'E11.9', '2022-05-10', 'Active'),
-('400000002', 'E66.0', '2022-05-10', 'Active'),
-
--- Patient 400000003 (Martha Kent): Breast cancer + Hypertension -> High Risk (cancer)
-('400000003', 'C50.9', '2026-08-20', 'Active'),
-('400000003', 'I10', '2019-11-02', 'Chronic'),
-
--- Patient 400000004 (Bruce Wayne): CAD & Family History -> Medium Risk
-('400000004', 'I25.1', '2024-02-18', 'Active'),
-('400000004', 'Z82.49', '2024-02-18', 'Active'),
-
--- Patient 400000005 (Diana Prince): Mild Hypercholesterolemia -> Low Risk
-('400000005', 'E78.0', '2025-01-10', 'Active'),
-
--- Patient 400000006 (Clark Kent): Heart Failure + CAD + Hypertension -> High Risk (Care gap: No future appt!)
-('400000006', 'I50.9', '2023-11-12', 'Chronic'),
-('400000006', 'I25.1', '2022-08-04', 'Chronic'),
-('400000006', 'I10', '2021-05-22', 'Chronic'),
-
--- Patient 400000007 (Peter Parker): Asthma -> Medium Risk (chronic respiratory)
-('400000007', 'J45.9', '2023-04-18', 'Chronic'),
-
--- Patient 400000008 (Tony Stark): Severe T2D + CAD + Hypercholesterolemia -> High Risk (Care gap: No future appt!)
-('400000008', 'E11.9', '2019-06-25', 'Chronic'),
-('400000008', 'I25.1', '2020-10-14', 'Chronic'),
-('400000008', 'E78.0', '2021-02-10', 'Chronic'),
-
--- Patient 400000009 (Natasha Romanoff): Obesity & Family History of breast cancer -> Low Risk (cancer)
-('400000009', 'E66.0', '2024-06-11', 'Active'),
-('400000009', 'Z80.3', '2024-06-11', 'Active'),
-
--- Patient 400000010 (Steve Rogers): COPD + Hypertension -> High Risk (chronic respiratory; Care gap: No future appt!)
-('400000010', 'J44.9', '2022-01-08', 'Chronic'),
-('400000010', 'I10', '2020-04-19', 'Chronic');
-
--- =========================================================================
--- 20. TEST THRESHOLD RULES (Associative table linking Test_Type & Medical_Condition)
---     HbA1c >= 6.5 and fasting glucose >= 7.0: Diabetes Canada diagnostic values
---     COPD: post-bronchodilator FEV1/FVC < 0.70 (GOLD); FEV1 < 80% = beyond mild
---     SBP >= 140: Hypertension Canada office treatment threshold
--- =========================================================================
+-- 15. Test Threshold Rules
 INSERT INTO Test_Threshold_Rules (Test_Name, ICD_Code, Abnormality_Threshold, Operator) VALUES
-('Systolic Blood Pressure (Clinical)', 'I10', 140.00, '>='),
-('Low-Density Lipoprotein (LDL-C)', 'E78.0', 3.50, '>='),
-('Total Cholesterol', 'E78.0', 5.20, '>='),
-('Glycated Hemoglobin (HbA1c)', 'E11.9', 6.50, '>='),
-('Fasting Blood Glucose', 'E11.9', 7.00, '>='),
-('High-Sensitivity C-Reactive Protein (hs-CRP)', 'I25.1', 3.00, '>'),
-('Body Mass Index (BMI)', 'E66.0', 30.00, '>='),
-('FEV1/FVC Ratio', 'J44.9', 0.70, '<'),
-('FEV1 (% Predicted)', 'J44.9', 80.00, '<'),
-('FEV1 (% Predicted)', 'J45.9', 80.00, '<'),
-('CA 15-3 (Breast Cancer Marker)', 'C50.9', 30.00, '>'),
-('Carcinoembryonic Antigen (CEA)', 'C50.9', 5.00, '>'),
-('Prostate-Specific Antigen (PSA)', 'C61', 4.00, '>');
+('Systolic Blood Pressure',                      'I10',    130.00, '>='),
+('Diastolic Blood Pressure',                     'I10',     85.00, '>='),
+('Low-Density Lipoprotein (LDL-C)',              'E78.5',    3.40, '>='),
+('Total Cholesterol',                            'E78.5',    5.20, '>='),
+('High-Sensitivity C-Reactive Protein (hs-CRP)', 'I25.10',   3.00, '>'),
+('Hemoglobin A1c (HbA1c)',                       'E11.9',    6.50, '>='),
+('Fasting Blood Glucose',                        'E11.9',    7.00, '>='),
+('Body Mass Index (BMI)',                        'E66.9',   30.00, '>='),
+('FEV1/FVC Ratio',                               'J44.9',    0.70, '<'),
+('FEV1 (% Predicted)',                           'J44.9',   80.00, '<'),
+('FEV1 (% Predicted)',                           'J45.90',  80.00, '<'),
+('Carcinoembryonic Antigen (CEA)',               'C18.9',    5.00, '>='),
+('Carcinoembryonic Antigen (CEA)',               'C34.90',   5.00, '>='),
+('CA 19-9 Tumor Antigen',                        'C18.9',   37.00, '>');
 
--- =========================================================================
--- 21. RISK MODELS 
--- =========================================================================
+-- 16. Risk Models
 INSERT INTO Risk_Models (NCD_Name, Effective_Date, Description, Admin_SSN) VALUES
-('Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01', 'Quantifies 10-year major adverse cardiovascular event risk using longitudinal clinical diagnoses, blood pressure, and lipid profiles.', '100000001'),
-('Metabolic & Type 2 Diabetes Complication Model', '2026-01-01', 'Calculates progressive microvascular and macrovascular triage risk based on glycemic control and comorbid metabolic factors.', '100000001'),
-('Cancer Risk Triage Model', '2026-01-01', 'Prioritizes patients for oncology review using cancer diagnoses, family history of cancer, and tumour marker results.', '100000001'),
-('Chronic Respiratory Disease Exacerbation Risk Model', '2026-01-01', 'Estimates exacerbation and hospitalization risk for asthma and COPD using diagnoses, spirometry (FEV1, FEV1/FVC) and comorbid conditions.', '100000001');
+('Cardiovascular Disease',      '2025-01-01', 'Previous 2025 heart disease model before 2026 weight update.', '100000001'),
+('Cardiovascular Disease',      '2026-01-01', 'Scores heart disease risk using blood pressure, cholesterol, smoking, and family history.', '100000001'),
+('Cardiovascular Disease',      '2027-01-01', 'Upcoming 2027 heart disease model with updated hypertension weight.', '100000001'),
+('Cancer',                      '2026-01-01', 'Scores cancer risk based on cancer diagnoses, smoking, and family history.', '100000001'),
+('Type 2 Diabetes',             '2026-01-01', 'Scores diabetes risk using diabetes diagnosis, obesity, diet, exercise, and family history.', '100000001'),
+('Type 2 Diabetes',             '2027-01-01', 'Draft 2027 diabetes pilot model (pending clinical approval).', '100000001'),
+('Chronic Respiratory Disease', '2026-01-01', 'Scores lung disease risk based on COPD, asthma, and smoking history.', '100000001');
 
--- =========================================================================
--- 22. RISK THRESHOLDS (Weak Entity of Risk_Models)
--- =========================================================================
+-- 17. Risk Thresholds
 INSERT INTO Risk_Thresholds (NCD_Name, Effective_Date, Risk_Tier, Min_Score, Max_Score) VALUES
--- Cardiovascular Model Tiers
-('Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01', 'Low', 0.00, 29.99),
-('Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01', 'Medium', 30.00, 59.99),
-('Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01', 'High', 60.00, 100.00),
+('Cardiovascular Disease',      '2025-01-01', 'Low',     0.00,  30.00),
+('Cardiovascular Disease',      '2025-01-01', 'Medium', 30.01,  65.00),
+('Cardiovascular Disease',      '2025-01-01', 'High',   65.01, 100.00),
 
--- Metabolic Model Tiers
-('Metabolic & Type 2 Diabetes Complication Model', '2026-01-01', 'Low', 0.00, 24.99),
-('Metabolic & Type 2 Diabetes Complication Model', '2026-01-01', 'Medium', 25.00, 54.99),
-('Metabolic & Type 2 Diabetes Complication Model', '2026-01-01', 'High', 55.00, 100.00),
+('Cardiovascular Disease',      '2026-01-01', 'Low',     0.00,  30.00),
+('Cardiovascular Disease',      '2026-01-01', 'Medium', 30.01,  65.00),
+('Cardiovascular Disease',      '2026-01-01', 'High',   65.01, 100.00),
 
--- Cancer Model Tiers
-('Cancer Risk Triage Model', '2026-01-01', 'Low', 0.00, 24.99),
-('Cancer Risk Triage Model', '2026-01-01', 'Medium', 25.00, 59.99),
-('Cancer Risk Triage Model', '2026-01-01', 'High', 60.00, 100.00),
+('Cardiovascular Disease',      '2027-01-01', 'Low',     0.00,  30.00),
+('Cardiovascular Disease',      '2027-01-01', 'Medium', 30.01,  65.00),
+('Cardiovascular Disease',      '2027-01-01', 'High',   65.01, 100.00),
 
--- Chronic Respiratory Model Tiers
-('Chronic Respiratory Disease Exacerbation Risk Model', '2026-01-01', 'Low', 0.00, 29.99),
-('Chronic Respiratory Disease Exacerbation Risk Model', '2026-01-01', 'Medium', 30.00, 59.99),
-('Chronic Respiratory Disease Exacerbation Risk Model', '2026-01-01', 'High', 60.00, 100.00);
+('Cancer',                      '2026-01-01', 'Low',     0.00,  20.00),
+('Cancer',                      '2026-01-01', 'Medium', 20.01,  55.00),
+('Cancer',                      '2026-01-01', 'High',   55.01, 100.00),
 
--- =========================================================================
--- 23. RISK MODEL EVALUATIONS (Associative weights between Model & Condition)
--- =========================================================================
+('Type 2 Diabetes',             '2026-01-01', 'Low',     0.00,  25.00),
+('Type 2 Diabetes',             '2026-01-01', 'Medium', 25.01,  55.00),
+('Type 2 Diabetes',             '2026-01-01', 'High',   55.01, 100.00),
+
+('Type 2 Diabetes',             '2027-01-01', 'Low',     0.00,  25.00),
+('Type 2 Diabetes',             '2027-01-01', 'Medium', 25.01,  55.00),
+('Type 2 Diabetes',             '2027-01-01', 'High',   55.01, 100.00),
+
+('Chronic Respiratory Disease', '2026-01-01', 'Low',     0.00,  25.00),
+('Chronic Respiratory Disease', '2026-01-01', 'Medium', 25.01,  60.00),
+('Chronic Respiratory Disease', '2026-01-01', 'High',   60.01, 100.00);
+
+-- 18. Risk Model Evaluations
 INSERT INTO Risk_Model_Evaluations (NCD_Name, Effective_Date, ICD_Code, Risk_Weight) VALUES
--- Weights for Cardiovascular Disease Model
-('Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01', 'I10', 25.00),
-('Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01', 'I25.1', 40.00),
-('Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01', 'I50.9', 45.00),
-('Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01', 'E78.0', 15.00),
-('Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01', 'Z82.49', 10.00),
+('Cardiovascular Disease', '2025-01-01', 'I10',    20.00),
+('Cardiovascular Disease', '2025-01-01', 'I25.10', 35.00),
+('Cardiovascular Disease', '2025-01-01', 'E78.5',  20.00),
+('Cardiovascular Disease', '2025-01-01', 'Z72.0',  20.00),
+('Cardiovascular Disease', '2025-01-01', 'Z82.49', 15.00),
+('Cardiovascular Disease', '2025-01-01', 'E66.9',  10.00),
 
--- Weights for Metabolic & Type 2 Diabetes Model
-('Metabolic & Type 2 Diabetes Complication Model', '2026-01-01', 'E11.9', 45.00),
-('Metabolic & Type 2 Diabetes Complication Model', '2026-01-01', 'E66.0', 20.00),
-('Metabolic & Type 2 Diabetes Complication Model', '2026-01-01', 'E78.0', 15.00),
-('Metabolic & Type 2 Diabetes Complication Model', '2026-01-01', 'I10', 20.00),
+('Cardiovascular Disease', '2026-01-01', 'I10',    25.00),
+('Cardiovascular Disease', '2026-01-01', 'I25.10', 35.00),
+('Cardiovascular Disease', '2026-01-01', 'E78.5',  20.00),
+('Cardiovascular Disease', '2026-01-01', 'Z72.0',  20.00),
+('Cardiovascular Disease', '2026-01-01', 'Z82.49', 15.00),
+('Cardiovascular Disease', '2026-01-01', 'E66.9',  10.00),
 
--- Weights for Cancer Risk Triage Model
-('Cancer Risk Triage Model', '2026-01-01', 'C50.9', 60.00),
-('Cancer Risk Triage Model', '2026-01-01', 'C61', 60.00),
-('Cancer Risk Triage Model', '2026-01-01', 'C34.9', 70.00),
-('Cancer Risk Triage Model', '2026-01-01', 'C18.9', 55.00),
-('Cancer Risk Triage Model', '2026-01-01', 'Z80.3', 20.00),
-('Cancer Risk Triage Model', '2026-01-01', 'I10', 10.00),
+('Cardiovascular Disease', '2027-01-01', 'I10',    30.00),
+('Cardiovascular Disease', '2027-01-01', 'I25.10', 35.00),
+('Cardiovascular Disease', '2027-01-01', 'E78.5',  20.00),
+('Cardiovascular Disease', '2027-01-01', 'Z72.0',  20.00),
+('Cardiovascular Disease', '2027-01-01', 'Z82.49', 15.00),
+('Cardiovascular Disease', '2027-01-01', 'E66.9',  10.00),
 
--- Weights for Chronic Respiratory Disease Model
-('Chronic Respiratory Disease Exacerbation Risk Model', '2026-01-01', 'J44.9', 50.00),
-('Chronic Respiratory Disease Exacerbation Risk Model', '2026-01-01', 'J45.9', 30.00),
-('Chronic Respiratory Disease Exacerbation Risk Model', '2026-01-01', 'I10', 15.00);
+('Cancer', '2026-01-01', 'C34.90', 50.00),
+('Cancer', '2026-01-01', 'C18.9',  45.00),
+('Cancer', '2026-01-01', 'C50.91', 45.00),
+('Cancer', '2026-01-01', 'Z72.0',  25.00),
+('Cancer', '2026-01-01', 'Z80.9',  25.00),
 
--- =========================================================================
--- 24. RISK ASSESSMENTS (Calculated patient risk snapshots)
--- =========================================================================
+('Type 2 Diabetes', '2026-01-01', 'E11.9',  40.00),
+('Type 2 Diabetes', '2026-01-01', 'E66.9',  25.00),
+('Type 2 Diabetes', '2026-01-01', 'Z72.3',  15.00),
+('Type 2 Diabetes', '2026-01-01', 'Z72.4',  10.00),
+('Type 2 Diabetes', '2026-01-01', 'Z83.3',  20.00),
+('Type 2 Diabetes', '2026-01-01', 'I10',    15.00),
+
+('Type 2 Diabetes', '2027-01-01', 'E11.9',  45.00),
+('Type 2 Diabetes', '2027-01-01', 'E66.9',  25.00),
+('Type 2 Diabetes', '2027-01-01', 'Z72.3',  15.00),
+('Type 2 Diabetes', '2027-01-01', 'Z72.4',  10.00),
+('Type 2 Diabetes', '2027-01-01', 'Z83.3',  20.00),
+('Type 2 Diabetes', '2027-01-01', 'I10',    15.00),
+
+('Chronic Respiratory Disease', '2026-01-01', 'J44.9',  50.00),
+('Chronic Respiratory Disease', '2026-01-01', 'Z72.0',  35.00),
+('Chronic Respiratory Disease', '2026-01-01', 'J45.90', 20.00);
+
+-- 19. Appointments (400000003 and 400000005 intentionally have no future appointments for care-gap testing)
+INSERT INTO Appointments (Appointment_Number, Appointment_Date, Appointment_Type, Status, Patient_SSN, Doctor_SSN, Admin_SSN, Department_Name, Room_Number) VALUES
+(1001, '2026-09-10 09:00:00', 'Initial Consultation', 'Completed', '400000001', '200000001', '100000002', 'Foothills Cardiology',        'CARD-101'),
+(1002, '2026-09-12 10:30:00', 'Initial Consultation', 'Completed', '400000002', '200000002', '100000002', 'Foothills Endocrinology',     'ENDO-201'),
+(1003, '2026-09-15 14:00:00', 'Initial Consultation', 'Completed', '400000003', '200000004', '100000002', 'Peter Lougheed Pulmonology',  'PULM-101'),
+(1004, '2026-09-18 11:15:00', 'Initial Consultation', 'Completed', '400000004', '200000003', '100000002', 'Foothills Oncology',          'ONCO-301'),
+(1005, '2026-09-22 13:00:00', 'Initial Consultation', 'Completed', '400000005', '200000001', '100000002', 'Foothills Cardiology',        'CARD-101'),
+(1006, '2026-10-05 09:30:00', 'Follow-Up',            'Completed', '400000001', '200000001', '100000002', 'Foothills Cardiology',        'CARD-101'),
+(1007, '2026-10-08 11:00:00', 'Follow-Up',            'Completed', '400000002', '200000002', '100000002', 'Foothills Endocrinology',     'ENDO-201'),
+(1008, '2026-10-15 15:30:00', 'Routine Checkup',      'Completed', '400000006', '200000005', '100000002', 'Peter Lougheed Internal Med', 'IMED-105'),
+(1009, '2026-10-20 10:00:00', 'Routine Checkup',      'Completed', '400000008', '200000002', '100000002', 'Foothills Endocrinology',     'ENDO-201'),
+(1010, '2026-10-25 14:00:00', 'Routine Checkup',      'Completed', '400000009', '200000003', '100000002', 'Foothills Oncology',          'ONCO-301'),
+(1011, '2026-11-28 10:00:00', 'Follow-Up',            'Scheduled', '400000001', '200000001', '100000002', 'Foothills Cardiology',        'CARD-101'),
+(1012, '2026-12-01 14:00:00', 'Follow-Up',            'Scheduled', '400000002', '200000002', '100000002', 'Foothills Endocrinology',     'ENDO-201'),
+(1013, '2026-12-03 10:00:00', 'Follow-Up',            'Scheduled', '400000004', '200000003', '100000002', 'Foothills Oncology',          'ONCO-301'),
+(1014, '2026-12-08 11:30:00', 'Routine Checkup',      'Scheduled', '400000007', '200000005', '100000002', 'Peter Lougheed Internal Med', 'IMED-105'),
+(1015, '2026-10-26 16:45:00', 'Emergency',            'Completed', '400000006', '200000001', '100000002', 'Foothills Cardiology',        'CARD-102'),
+(1016, '2026-10-28 09:00:00', 'Follow-Up',            'Cancelled', '400000008', '200000002', '100000002', 'Foothills Endocrinology',     'ENDO-201'),
+(1017, '2026-10-30 13:15:00', 'Routine Checkup',      'No-Show',   '400000011', '200000005', '100000002', 'Peter Lougheed Internal Med', 'IMED-105'),
+(1018, '2026-08-05 09:00:00', 'Initial Consultation', 'Completed', '400000012', '200000001', '100000002', 'Foothills Cardiology',        'CARD-101'),
+(1019, '2026-10-20 09:30:00', 'Initial Consultation', 'Completed', '400000007', '200000002', '100000002', 'Foothills Endocrinology',     'ENDO-201'),
+(1020, '2026-10-22 10:00:00', 'Routine Checkup',      'Completed', '400000010', '200000005', '100000002', 'Peter Lougheed Internal Med', 'IMED-105');
+
+-- 20. Appointment Treatments
+INSERT INTO Appointment_Treatments (Appointment_Number, Treatment_Code, Treatment_Date, Status) VALUES
+(1001, 'TX-LFS-01', '2026-09-10', 'Completed'),
+(1001, 'TX-LFS-03', '2026-09-10', 'In Progress'),
+(1002, 'TX-LFS-01', '2026-09-12', 'In Progress'),
+(1002, 'TX-MON-02', '2026-09-12', 'Completed'),
+(1003, 'TX-LFS-02', '2026-09-15', 'In Progress'),
+(1003, 'TX-THP-01', '2026-09-15', 'In Progress'),
+(1003, 'TX-THP-04', '2026-09-15', 'Completed'),
+(1003, 'TX-MON-04', '2026-09-15', 'Completed'),
+(1004, 'TX-SRG-02', '2026-09-18', 'Completed'),
+(1004, 'TX-THP-02', '2026-09-25', 'In Progress'),
+(1004, 'TX-MON-03', '2026-09-18', 'In Progress'),
+(1005, 'TX-LFS-01', '2026-09-22', 'Recommended'),
+(1005, 'TX-LFS-02', '2026-09-22', 'Recommended'),
+(1006, 'TX-MON-01', '2026-10-05', 'Completed'),
+(1010, 'TX-MON-03', '2026-10-25', 'Recommended'),
+(1016, 'TX-MON-02', '2026-10-28', 'Cancelled'),
+(1019, 'TX-LFS-01', '2026-10-20', 'In Progress'),
+(1020, 'TX-LFS-01', '2026-10-22', 'Completed');
+
+-- 21. Appointment Prescriptions
+INSERT INTO Appointment_Prescriptions (Appointment_Number, DIN, Dose, Instruction, Status) VALUES
+(1001, '02221853', '10 mg',    'Take 1 capsule daily by mouth in the morning',        'Active'),
+(1001, '02230713', '20 mg',    'Take 1 tablet daily by mouth at bedtime',             'Active'),
+(1002, '02099233', '500 mg',   'Take 1 tablet twice daily with meals',                'Active'),
+(1002, '02443937', '10 mg',    'Take 1 tablet once daily in the morning',             'Active'),
+(1003, '02241497', '100 mcg',  'Inhale 2 puffs every 4 to 6 hours as needed',         'Active'),
+(1003, '02435381', '2.5 mcg',  'Inhale 2 puffs once daily every morning',             'Active'),
+(1004, '02404589', '500 mg',   'Take orally twice daily for 14 days of 21-day cycle', 'Active'),
+(1005, '02221853', '10 mg',    'Take 1 capsule daily by mouth in the morning',        'Active'),
+(1005, '02247162', '10 mg',    'Take 1 tablet daily at bedtime',                      'Active'),
+(1006, '00878928', '5 mg',     'Take 1 tablet once daily in the morning',             'Active'),
+(1007, '02294338', '10 units', 'Inject subcutaneously once daily at bedtime',         'Active'),
+(1009, '02099233', '500 mg',   'Take 1 tablet once daily with dinner',                'Active'),
+(1009, '02443937', '10 mg',    'Discontinued due to mild dizziness',                  'Discontinued'),
+(1015, '02221853', '10 mg',    'Administered in urgent care',                         'Completed');
+
+-- 22. Lab Tests
+INSERT INTO Lab_Tests (Accession_Number, Test_Date, Test_Result, Status, Appointment_Number, Lab_Assistant_SSN, Test_Name) VALUES
+('ACC-2026-001', '2026-09-10', 148.00, 'Completed',   1001, '300000001', 'Systolic Blood Pressure'),
+('ACC-2026-002', '2026-09-10',  92.00, 'Completed',   1001, '300000001', 'Diastolic Blood Pressure'),
+('ACC-2026-003', '2026-09-10',   4.10, 'Completed',   1001, '300000001', 'Low-Density Lipoprotein (LDL-C)'),
+('ACC-2026-004', '2026-09-10',   4.60, 'Completed',   1001, '300000001', 'High-Sensitivity C-Reactive Protein (hs-CRP)'),
+('ACC-2026-005', '2026-09-12',   8.20, 'Completed',   1002, '300000001', 'Hemoglobin A1c (HbA1c)'),
+('ACC-2026-006', '2026-09-12',   9.60, 'Completed',   1002, '300000001', 'Fasting Blood Glucose'),
+('ACC-2026-007', '2026-09-12',  32.40, 'Completed',   1002, '300000001', 'Body Mass Index (BMI)'),
+('ACC-2026-008', '2026-09-15',   0.64, 'Completed',   1003, '300000002', 'FEV1/FVC Ratio'),
+('ACC-2026-009', '2026-09-15',  58.00, 'Completed',   1003, '300000002', 'FEV1 (% Predicted)'),
+('ACC-2026-010', '2026-09-18',  14.80, 'Completed',   1004, '300000003', 'Carcinoembryonic Antigen (CEA)'),
+('ACC-2026-011', '2026-09-18',  68.50, 'Completed',   1004, '300000003', 'CA 19-9 Tumor Antigen'),
+('ACC-2026-012', '2026-09-22', 142.00, 'Completed',   1005, '300000001', 'Systolic Blood Pressure'),
+('ACC-2026-013', '2026-09-22',   5.90, 'Completed',   1005, '300000001', 'Total Cholesterol'),
+('ACC-2026-104', '2026-10-05', 128.00, 'Completed',   1006, '300000001', 'Systolic Blood Pressure'),
+('ACC-2026-015', '2026-10-08',   7.10, 'Completed',   1007, '300000001', 'Hemoglobin A1c (HbA1c)'),
+('ACC-2026-016', '2026-10-15',   5.10, 'Completed',   1008, '300000001', 'Fasting Blood Glucose'),
+('ACC-2026-017', '2026-10-20',   6.40, 'Completed',   1009, '300000001', 'Hemoglobin A1c (HbA1c)'),
+('ACC-2026-018', '2026-10-25',   2.10, 'Completed',   1010, '300000003', 'Carcinoembryonic Antigen (CEA)'),
+('ACC-2026-019', '2026-11-28',   NULL, 'Ordered',     1011, '300000001', 'Low-Density Lipoprotein (LDL-C)'),
+('ACC-2026-020', '2026-12-01',   NULL, 'In Progress', 1012, '300000001', 'Hemoglobin A1c (HbA1c)'),
+('ACC-2026-021', '2026-10-28',   NULL, 'Cancelled',   1016, '300000001', 'Fasting Blood Glucose'),
+('ACC-2026-022', '2026-10-20',   5.50, 'Completed',   1019, '300000001', 'Hemoglobin A1c (HbA1c)'),
+('ACC-2026-023', '2026-10-22',   5.20, 'Completed',   1020, '300000001', 'Hemoglobin A1c (HbA1c)'),
+('ACC-2026-024', '2026-10-20',   6.80, 'Completed',   1009, '300000001', 'Fasting Blood Glucose'),
+('ACC-2026-025', '2026-10-20',   5.40, 'Completed',   1019, '300000001', 'Fasting Blood Glucose'),
+('ACC-2026-026', '2026-10-22',   4.90, 'Completed',   1020, '300000001', 'Fasting Blood Glucose'),
+('ACC-2026-027', '2026-10-26', 136.00, 'Completed',   1015, '300000001', 'Systolic Blood Pressure'),
+('ACC-2026-028', '2026-10-20', 118.00, 'Completed',   1019, '300000001', 'Systolic Blood Pressure'),
+('ACC-2026-029', '2026-10-22', 114.00, 'Completed',   1020, '300000001', 'Systolic Blood Pressure');
+
+-- 23. Patient Diagnoses
+INSERT INTO Patient_Diagnoses (Patient_SSN, ICD_Code, Diagnosis_Date, Status) VALUES
+('400000001', 'I10',    '2018-05-10', 'Chronic'),
+('400000001', 'I25.10', '2021-03-22', 'Chronic'),
+('400000001', 'E78.5',  '2019-11-14', 'Resolved'),
+('400000001', 'Z82.49', '2018-05-10', 'Chronic'),
+('400000002', 'E11.9',  '2017-02-18', 'Chronic'),
+('400000002', 'E66.9',  '2019-06-30', 'Active'),
+('400000002', 'I10',    '2020-01-15', 'Chronic'),
+('400000002', 'Z83.3',  '2017-02-18', 'Chronic'),
+('400000003', 'J44.9',  '2022-08-11', 'Chronic'),
+('400000003', 'Z72.0',  '2010-01-01', 'Active'),
+('400000003', 'J45.90', '2015-04-12', 'Active'),
+('400000004', 'C18.9',  '2025-11-05', 'Active'),
+('400000004', 'Z72.0',  '2016-12-01', 'Active'),
+('400000004', 'Z80.9',  '2020-09-05', 'Chronic'),
+('400000005', 'I10',    '2021-04-19', 'Chronic'),
+('400000005', 'E78.5',  '2021-04-19', 'Chronic'),
+('400000005', 'Z72.0',  '2015-06-01', 'Active'),
+('400000005', 'Z82.49', '2021-04-19', 'Chronic'),
+('400000006', 'I10',    '2023-01-10', 'Active'),
+('400000006', 'E78.5',  '2024-01-10', 'Resolved'),
+('400000006', 'Z72.0',  '2024-01-10', 'Resolved'),
+('400000006', 'E66.9',  '2024-01-10', 'Resolved'),
+('400000007', 'Z72.4',  '2024-02-14', 'Active'),
+('400000008', 'E11.9',  '2022-10-01', 'Chronic'),
+('400000009', 'Z80.9',  '2023-05-18', 'Chronic'),
+('400000010', 'Z72.3',  '2025-01-10', 'Resolved'),
+('400000011', 'E11.9',  '2020-03-15', 'Chronic'),
+('400000011', 'I10',    '2021-06-20', 'Chronic'),
+('400000011', 'E66.9',  '2022-01-10', 'Active'),
+('400000012', 'I25.10', '2016-05-12', 'Chronic'),
+('400000012', 'I10',    '2014-08-01', 'Chronic'),
+('400000012', 'Z72.0',  '2010-01-01', 'Active');
+
+-- 24. Risk Assessments (ordered chronologically; 400000010 intentionally has no assessment yet)
 INSERT INTO Risk_Assessments (Assessment_Number, Assessment_Date, Score, Risk_Level, Patient_SSN, NCD_Name, Effective_Date) VALUES
-(501, '2026-08-11 11:00:00', 80.00, 'High', '400000001', 'Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01'),
-(502, '2026-08-16 12:30:00', 45.00, 'Medium', '400000002', 'Metabolic & Type 2 Diabetes Complication Model', '2026-01-01'),
-(503, '2026-08-21 15:00:00', 70.00, 'High', '400000003', 'Cancer Risk Triage Model', '2026-01-01'),
-(504, '2026-09-06 14:00:00', 50.00, 'Medium', '400000004', 'Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01'),
-(505, '2026-09-13 10:00:00', 15.00, 'Low', '400000005', 'Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01'),
-(506, '2026-09-26 16:30:00', 85.00, 'High', '400000006', 'Cardiovascular Disease Risk Model (Framingham-Alberta Adaptation)', '2026-01-01'),
-(507, '2026-10-03 11:30:00', 30.00, 'Medium', '400000007', 'Chronic Respiratory Disease Exacerbation Risk Model', '2026-01-01'),
-(508, '2026-10-19 14:00:00', 90.00, 'High', '400000008', 'Metabolic & Type 2 Diabetes Complication Model', '2026-01-01'),
-(509, '2026-10-29 10:15:00', 20.00, 'Low', '400000009', 'Cancer Risk Triage Model', '2026-01-01'),
-(510, '2026-11-03 16:00:00', 65.00, 'High', '400000010', 'Chronic Respiratory Disease Exacerbation Risk Model', '2026-01-01');
+(5001, '2026-06-10 10:00:00',  75.00, 'High',   '400000006', 'Cardiovascular Disease',      '2026-01-01'),
+(5002, '2026-08-05 09:30:00',  80.00, 'High',   '400000012', 'Cardiovascular Disease',      '2026-01-01'),
+(5003, '2026-08-15 11:00:00',  80.00, 'High',   '400000011', 'Type 2 Diabetes',             '2026-01-01'),
+(5004, '2026-09-10 11:30:00',  95.00, 'High',   '400000001', 'Cardiovascular Disease',      '2026-01-01'),
+(5005, '2026-09-10 11:35:00',  15.00, 'Low',    '400000001', 'Type 2 Diabetes',             '2026-01-01'),
+(5006, '2026-09-12 12:00:00', 100.00, 'High',   '400000002', 'Type 2 Diabetes',             '2026-01-01'),
+(5007, '2026-09-12 12:05:00',  35.00, 'Medium', '400000002', 'Cardiovascular Disease',      '2026-01-01'),
+(5008, '2026-09-15 16:30:00', 100.00, 'High',   '400000003', 'Chronic Respiratory Disease', '2026-01-01'),
+(5009, '2026-09-15 16:35:00',  20.00, 'Low',    '400000003', 'Cardiovascular Disease',      '2026-01-01'),
+(5010, '2026-09-15 16:40:00',  25.00, 'Medium', '400000003', 'Cancer',                      '2026-01-01'),
+(5011, '2026-09-18 13:00:00',  95.00, 'High',   '400000004', 'Cancer',                      '2026-01-01'),
+(5012, '2026-09-18 13:05:00',  20.00, 'Low',    '400000004', 'Cardiovascular Disease',      '2026-01-01'),
+(5013, '2026-09-18 13:10:00',  35.00, 'Medium', '400000004', 'Chronic Respiratory Disease', '2026-01-01'),
+(5014, '2026-09-22 14:00:00',  80.00, 'High',   '400000005', 'Cardiovascular Disease',      '2026-01-01'),
+(5015, '2026-09-22 14:05:00',  25.00, 'Medium', '400000005', 'Cancer',                      '2026-01-01'),
+(5016, '2026-09-22 14:10:00',  15.00, 'Low',    '400000005', 'Type 2 Diabetes',             '2026-01-01'),
+(5017, '2026-09-22 14:15:00',  35.00, 'Medium', '400000005', 'Chronic Respiratory Disease', '2026-01-01'),
+(5018, '2026-10-05 10:30:00',  75.00, 'High',   '400000001', 'Cardiovascular Disease',      '2026-01-01'),
+(5019, '2026-10-08 12:00:00', 100.00, 'High',   '400000002', 'Type 2 Diabetes',             '2026-01-01'),
+(5020, '2026-10-15 16:45:00',  25.00, 'Low',    '400000006', 'Cardiovascular Disease',      '2026-01-01'),
+(5021, '2026-10-15 16:50:00',  15.00, 'Low',    '400000006', 'Type 2 Diabetes',             '2026-01-01'),
+(5022, '2026-10-20 10:15:00',  10.00, 'Low',    '400000007', 'Type 2 Diabetes',             '2026-01-01'),
+(5023, '2026-10-22 11:30:00',  40.00, 'Medium', '400000008', 'Type 2 Diabetes',             '2026-01-01'),
+(5024, '2026-10-25 09:30:00',  25.00, 'Medium', '400000009', 'Cancer',                      '2026-01-01'),
+(5025, '2025-09-10 10:00:00',  70.00, 'High',   '400000001', 'Cardiovascular Disease',      '2025-01-01'),
+(5026, '2025-11-15 14:00:00',  75.00, 'High',   '400000005', 'Cardiovascular Disease',      '2025-01-01');
 
--- =========================================================================
--- 25. NOTIFICATIONS (Weak Entity of Risk_Assessments -> Clinical Provider Alerts)
---     PK is (Assessment_Number, Date_Notified): two alerts for the same
---     assessment need different timestamps, so the second one is 1 minute later.
--- =========================================================================
+-- 25. Notifications
 INSERT INTO Notifications (Assessment_Number, Date_Notified, Recipient_User_SSN, Message) VALUES
-(501, '2026-08-11 11:05:00', '200000001', 'CRITICAL ALERT: Patient James Wilson assessed as HIGH risk (Score: 80.00) under Cardiovascular Model. Multidisciplinary care plan review required.'),
-(501, '2026-08-11 11:06:00', '100000001', 'PRIORITY TRIAGE: Patient James Wilson requires high-risk care coordination and cardiology follow-up scheduling.'),
-(503, '2026-08-21 15:05:00', '200000003', 'CRITICAL ALERT: Patient Martha Kent assessed as HIGH risk (Score: 70.00) under Cancer Risk Triage Model. Oncology treatment plan and hormone therapy review required.'),
-(506, '2026-09-26 16:35:00', '200000001', 'CRITICAL ALERT: Patient Clark Kent assessed as HIGH risk (Score: 85.00) following acute cardiovascular episode. Urgent physician follow-up required.'),
-(506, '2026-09-26 16:36:00', '100000001', 'CARE GAP NOTICE: Patient Clark Kent flagged HIGH risk with NO upcoming follow-up appointments scheduled.'),
-(508, '2026-10-19 14:05:00', '200000002', 'CRITICAL ALERT: Patient Tony Stark assessed as HIGH risk (Score: 90.00) for severe Diabetic and Vascular complications. Urgent follow-up required.'),
-(508, '2026-10-19 14:06:00', '100000001', 'CARE GAP NOTICE: Patient Tony Stark has HIGH risk triage level with NO future appointments booked in system.'),
-(510, '2026-11-03 16:05:00', '200000004', 'CRITICAL ALERT: Patient Steve Rogers assessed as HIGH risk (Score: 65.00) for chronic respiratory exacerbation. Pulmonary rehabilitation and inhaler therapy review required.'),
-(510, '2026-11-03 16:06:00', '100000001', 'CARE GAP NOTICE: Patient Steve Rogers flagged HIGH risk with NO upcoming follow-up appointments scheduled.');
-
--- =========================================================================
--- END OF DML SEED DATA POPULATION SCRIPT
--- =========================================================================
+(5004, '2026-09-10 11:30:05', '200000001', 'HIGH RISK ALERT: Patient Arthur Pendleton (AB-904812301) scored 95.00 (High Risk) for Cardiovascular Disease.'),
+(5004, '2026-09-10 11:31:05', '100000002', 'CARE GAP NOTICE: Patient Arthur Pendleton (AB-904812301) flagged High Risk (95.00) for Cardiovascular Disease with NO upcoming appointment scheduled.'),
+(5006, '2026-09-12 12:00:05', '200000002', 'HIGH RISK ALERT: Patient Beatrice Gomez (AB-904812302) scored 100.00 (High Risk) for Type 2 Diabetes.'),
+(5008, '2026-09-15 16:30:05', '200000004', 'HIGH RISK ALERT: Patient Chloe Desjardins (AB-904812303) scored 100.00 (High Risk) for Chronic Respiratory Disease.'),
+(5008, '2026-09-15 16:31:05', '100000002', 'CARE GAP NOTICE: Patient Chloe Desjardins (AB-904812303) flagged High Risk (100.00) for Chronic Respiratory Disease with NO upcoming appointment scheduled.'),
+(5011, '2026-09-18 13:00:05', '200000003', 'HIGH RISK ALERT: Patient Devon Blackwood (AB-904812304) scored 95.00 (High Risk) for Cancer.'),
+(5014, '2026-09-22 14:00:05', '200000001', 'HIGH RISK ALERT: Patient Evelyn Kowalski (AB-904812305) scored 80.00 (High Risk) for Cardiovascular Disease.'),
+(5014, '2026-09-22 14:01:05', '100000002', 'CARE GAP NOTICE: Patient Evelyn Kowalski (AB-904812305) flagged High Risk (80.00) for Cardiovascular Disease with NO upcoming appointment scheduled.'),
+(5018, '2026-10-05 10:30:05', '200000001', 'FOLLOW-UP ALERT: Patient Arthur Pendleton (AB-904812301) scored 75.00 (previous: 95.00, still High Risk) for Cardiovascular Disease.'),
+(5019, '2026-10-08 12:00:05', '200000002', 'FOLLOW-UP ALERT: Patient Beatrice Gomez (AB-904812302) scored 100.00 (previous: 100.00, still High Risk) for Type 2 Diabetes.');
