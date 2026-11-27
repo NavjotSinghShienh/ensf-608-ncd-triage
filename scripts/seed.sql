@@ -340,7 +340,7 @@ INSERT INTO Risk_Model_Evaluations (NCD_Name, Effective_Date, ICD_Code, Risk_Wei
 ('Chronic Respiratory Disease', '2026-01-01', 'Z72.0',  35.00),
 ('Chronic Respiratory Disease', '2026-01-01', 'J45.90', 20.00);
 
--- 19. Appointments (400000003 and 400000005 intentionally have no future appointments for care-gap testing)
+-- 19. Appointments
 INSERT INTO Appointments (Appointment_Number, Appointment_Date, Appointment_Type, Status, Patient_SSN, Doctor_SSN, Admin_SSN, Department_Name, Room_Number) VALUES
 (1001, '2026-09-10 09:00:00', 'Initial Consultation', 'Completed', '400000001', '200000001', '100000002', 'Foothills Cardiology',        'CARD-101'),
 (1002, '2026-09-12 10:30:00', 'Initial Consultation', 'Completed', '400000002', '200000002', '100000002', 'Foothills Endocrinology',     'ENDO-201'),
@@ -416,7 +416,7 @@ INSERT INTO Lab_Tests (Accession_Number, Test_Date, Test_Result, Status, Appoint
 ('ACC-2026-011', '2026-09-18',  68.50, 'Completed',   1004, '300000003', 'CA 19-9 Tumor Antigen'),
 ('ACC-2026-012', '2026-09-22', 142.00, 'Completed',   1005, '300000001', 'Systolic Blood Pressure'),
 ('ACC-2026-013', '2026-09-22',   5.90, 'Completed',   1005, '300000001', 'Total Cholesterol'),
-('ACC-2026-104', '2026-10-05', 128.00, 'Completed',   1006, '300000001', 'Systolic Blood Pressure'),
+('ACC-2026-014', '2026-10-05', 128.00, 'Completed',   1006, '300000001', 'Systolic Blood Pressure'),
 ('ACC-2026-015', '2026-10-08',   7.10, 'Completed',   1007, '300000001', 'Hemoglobin A1c (HbA1c)'),
 ('ACC-2026-016', '2026-10-15',   5.10, 'Completed',   1008, '300000001', 'Fasting Blood Glucose'),
 ('ACC-2026-017', '2026-10-20',   6.40, 'Completed',   1009, '300000001', 'Hemoglobin A1c (HbA1c)'),
@@ -468,7 +468,7 @@ INSERT INTO Patient_Diagnoses (Patient_SSN, ICD_Code, Diagnosis_Date, Status) VA
 ('400000012', 'I10',    '2014-08-01', 'Chronic'),
 ('400000012', 'Z72.0',  '2010-01-01', 'Active');
 
--- 24. Risk Assessments (ordered chronologically; 400000010 intentionally has no assessment yet)
+-- 24. Risk Assessments
 INSERT INTO Risk_Assessments (Assessment_Number, Assessment_Date, Score, Risk_Level, Patient_SSN, NCD_Name, Effective_Date) VALUES
 (5001, '2026-06-10 10:00:00',  75.00, 'High',   '400000006', 'Cardiovascular Disease',      '2026-01-01'),
 (5002, '2026-08-05 09:30:00',  80.00, 'High',   '400000012', 'Cardiovascular Disease',      '2026-01-01'),
