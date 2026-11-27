@@ -18,6 +18,9 @@
 8. [Normalization Summary (1NF, 2NF, 3NF)](#8-normalization-summary-1nf-2nf-3nf)
 9. [Key Database Queries & Analytical Use Cases](#9-key-database-queries--analytical-use-cases)
 10. [Required SQL Operations, Testing & Final Deliverables](#10-required-sql-operations-testing--final-deliverables)
+11. [How to Create, Populate, and Use the Database](#11-how-to-create-populate-and-use-the-database)
+12. [Team Contributions](#12-team-contributions)
+13. [Generative AI Disclosure](#13-generative-ai-disclosure)
 
 ---
 
@@ -65,7 +68,10 @@ This database operationalizes **United Nations Sustainable Development Goal 3: G
 ```text
 ensf-608-ncd-triage/
 ├── docs/
-│   └── Normalization_Decisions.docx          # Detailed 1NF, 2NF, 3NF decisions & FD registry
+│   ├── Normalization_Decisions.docx          # Detailed 1NF, 2NF, 3NF decisions & FD registry
+│   ├── Query_Execution_Results.md            # Executed DML & stored procedure query evidence
+│   ├── Testing_Results.md                    # Database constraint & positive DML test results (26/26 PASS)
+│   └── screenshots/                          # MySQL Workbench execution screenshots (DML & procedure)
 ├── models/
 │   ├── Conceptual_Model.drawio               # Editable Draw.io EER Conceptual Model
 │   ├── Conceptual_Model_Image.png            # Exported Conceptual Model diagram (PNG)
@@ -73,7 +79,11 @@ ensf-608-ncd-triage/
 │   ├── Logical_Model_Image.png               # Exported Logical Model schema diagram (PNG)
 │   └── Relational_Schema_Logical_Model.md    # Relational Schema with data types, domains & keys
 ├── scripts/
-│   └── DDL.sql                               # Physical SQL database creation & constraints
+│   ├── DDL.sql                               # Physical SQL database creation & constraints (25 tables)
+│   ├── seed.sql                              # Sample clinical dataset (Calgary AHS, WHO ICD-10, DINs)
+│   ├── procedure.sql                         # Stored procedures (sp_Notify, sp_CalculateRiskAssessment)
+│   ├── DML.sql                               # 29 SQL operations & analytical queries
+│   └── testing.sql                           # Automated structural, positive DML & negative constraint tests
 └── README.md                                 # Project documentation
 ```
 
@@ -377,4 +387,41 @@ Per the **ENSF 608 Project Description**, the physical implementation and testin
 ### Systematic Database Testing
 The database testing suite verifies:
 - **Structural & Constraint Integrity:** Primary key uniqueness, foreign key referential integrity (`ON DELETE` / `ON UPDATE` rules), `UNIQUE` constraints (`Healthcare_Number`, `Employee_Number`, `License_Number`, `Certification_Number`), `NOT NULL` enforcement, and domain `CHECK` constraints (e.g., valid status values and score ranges).
-- **Positive & Negative Test Cases:** Execution evidence demonstrating both valid clinical transactions and proper rejection of invalid or inconsistent data.
+- **Positive & Negative Test Cases:** Execution evidence demonstrating both valid clinical transactions and proper rejection of invalid or inconsistent data (see [`scripts/testing.sql`](scripts/testing.sql) and [`docs/Testing_Results.md`](docs/Testing_Results.md)).
+
+---
+
+## 11. How to Create, Populate, and Use the Database
+
+### Prerequisites
+- **MySQL Server 8.0+** (tested on MySQL 8.4) and **MySQL Workbench** (or the `mysql` CLI).
+
+### Execution Order
+Run the scripts in [`scripts/`](scripts/) in the following exact order:
+
+1. **Create schema & constraints:** [`scripts/DDL.sql`](scripts/DDL.sql) — creates `NCD_Risk_Identification_System` and all 25 tables with named `PK_`, `FK_`, `UQ_`, and `CK_` constraints.
+2. **Populate seed dataset:** [`scripts/seed.sql`](scripts/seed.sql) — loads Calgary AHS facilities, WHO ICD-10 conditions, Health Canada DINs, users, patients, appointments, lab tests, versioned risk models, assessments, and notifications.
+3. **Create stored procedures:** [`scripts/procedure.sql`](scripts/procedure.sql) — creates `sp_Notify` and `sp_CalculateRiskAssessment` and runs transaction-wrapped scenario checks.
+4. **Run DML & analytical queries:** [`scripts/DML.sql`](scripts/DML.sql) — executes all 29 SQL operations (`INSERT`, `UPDATE`, `DELETE` wrapped in `START TRANSACTION; ... ROLLBACK;` plus all `SELECT`, `JOIN`, aggregate, `GROUP BY`, and complex analytical queries; execution screenshots documented in [`docs/Query_Execution_Results.md`](docs/Query_Execution_Results.md)).
+5. **Run database test suite:** [`scripts/testing.sql`](scripts/testing.sql) — executes structural verification, positive transaction tests, and negative constraint-rejection tests (results documented in [`docs/Testing_Results.md`](docs/Testing_Results.md)).
+
+*(In MySQL Workbench, open each file via **File → Open SQL Script...** and execute in the order listed above.)*
+
+---
+
+## 12. Team Contributions
+
+All four team members contributed across their assigned project roles (aligned with the approved Team Project Proposal and verified via Git commit history). In addition, **Conceptual Modelling and Logical Modelling were completed as a collaborative effort across the entire team**.
+
+| Participant Name | UCID | Team Role |
+| :--- | :---: | :--- |
+| **Navjot Singh Shienh** | 30332849 | Project Management, Requirements gathering, Database Implementation |
+| **Iesrat Jahan Popy** | 30304908 | Conceptual Model, Data Population |
+| **Nikita Williams** | 30143759 | Logical Model, Normalization |
+| **Md Jubayer Khan** | 30336019 | Documentation, Database Testing |
+
+---
+
+## 13. Generative AI Disclosure
+
+In accordance with the **ENSF 608 Academic Integrity and Generative AI** policy, generative AI tools (Google Gemini / Antigravity) were used in a supporting role to brainstorm analytical query ideas, assist with documentation formatting, troubleshoot SQL syntax, and review schema/rubric consistency. All database models, constraints, seed data, SQL operations, stored procedures, and test cases were reviewed, adapted, executed, and verified by the team.
