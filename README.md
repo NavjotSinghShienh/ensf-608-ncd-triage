@@ -10,7 +10,7 @@
 
 1. [Project Overview](#1-project-overview)
 2. [UN Sustainable Development Goal (SDG) Alignment](#2-un-sustainable-development-goal-sdg-alignment)
-3. [Team Members & Roles](#3-team-members--roles)
+3. [Team Members, Roles & Contributions](#3-team-members-roles--contributions)
 4. [Repository Structure](#4-repository-structure)
 5. [Project Continuity: Evolution from Proposal to Models](#5-project-continuity-evolution-from-proposal-to-models)
 6. [Conceptual Database Model (EER Diagram)](#6-conceptual-database-model-eer-diagram)
@@ -19,8 +19,7 @@
 9. [Key Database Queries & Analytical Use Cases](#9-key-database-queries--analytical-use-cases)
 10. [Required SQL Operations, Testing & Final Deliverables](#10-required-sql-operations-testing--final-deliverables)
 11. [How to Create, Populate, and Use the Database](#11-how-to-create-populate-and-use-the-database)
-12. [Team Contributions](#12-team-contributions)
-13. [Generative AI Disclosure](#13-generative-ai-disclosure)
+12. [Generative AI Disclosure](#12-generative-ai-disclosure)
 
 ---
 
@@ -52,7 +51,9 @@ This database operationalizes **United Nations Sustainable Development Goal 3: G
 
 ---
 
-## 3. Team Members & Roles
+## 3. Team Members, Roles & Contributions
+
+All four team members contributed across their assigned project roles (aligned with the approved Team Project Proposal and verified via Git commit history). In addition, **Conceptual Modelling and Logical Modelling were completed as a collaborative effort across the entire team**.
 
 | Participant Name | UCID | Team Role & Responsibilities |
 | :--- | :---: | :--- |
@@ -410,19 +411,6 @@ Run the scripts in [`scripts/`](scripts/) in the following exact order:
 
 ---
 
-## 12. Team Contributions
-
-All four team members contributed across their assigned project roles (aligned with the approved Team Project Proposal and verified via Git commit history). In addition, **Conceptual Modelling and Logical Modelling were completed as a collaborative effort across the entire team**.
-
-| Participant Name | UCID | Team Role & Responsibilities |
-| :--- | :---: | :--- |
-| **Navjot Singh Shienh** | `30332849` | Project Management, Requirements Gathering, Database Implementation |
-| **Iesrat Jahan Popy** | `30304908` | Conceptual Model, Data Population |
-| **Nikita Williams** | `30143759` | Logical Model, Normalization |
-| **Md Jubayer Khan** | `30336019` | Documentation, Database Testing |
-
----
-
-## 13. Generative AI Disclosure
+## 12. Generative AI Disclosure
 
 In accordance with the **ENSF 608 Academic Integrity and Generative AI** policy, generative AI tools (Google Gemini / Antigravity) were used in a supporting role to brainstorm analytical query ideas, assist with documentation formatting, troubleshoot SQL syntax, and review schema/rubric consistency. All database models, constraints, seed data, SQL operations, stored procedures, and test cases were reviewed, adapted, executed, and verified by the team.
