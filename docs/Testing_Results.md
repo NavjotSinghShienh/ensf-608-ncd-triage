@@ -16,25 +16,51 @@ Section 1 (`1.1`–`1.6`) and Section 2 (`2.1`–`2.8`) verify referential integ
 
 ## 1. Referential Integrity & Threshold Consistency Checks (Expected: 0 rows)
 
-- **1.1 Patients without matching `Users` rows:** ![1.1](screenshots/testing/1.1.png)
-- **1.2 Appointments referencing inactive or non-Doctor users:** ![1.2](screenshots/testing/1.2.png)
-- **1.3 Lab tests referencing inactive or non-Lab-Assistant users:** ![1.3](screenshots/testing/1.3.png)
-- **1.4 Duplicate user email addresses:** ![1.4](screenshots/testing/1.4.png)
-- **1.5 High-risk assessments missing notifications:** ![1.5](screenshots/testing/1.5.png)
-- **1.6 Risk assessments whose `Risk_Level` does not match `Risk_Thresholds`:** ![1.6](screenshots/testing/1.6.png)
+### `1.1` — Patients without matching `Users` rows
+![1.1](screenshots/testing/1.1.png)
+
+### `1.2` — Appointments referencing inactive or non-Doctor users
+![1.2](screenshots/testing/1.2.png)
+
+### `1.3` — Lab tests referencing inactive or non-Lab-Assistant users
+![1.3](screenshots/testing/1.3.png)
+
+### `1.4` — Duplicate user email addresses
+![1.4](screenshots/testing/1.4.png)
+
+### `1.5` — High-risk assessments missing notifications
+![1.5](screenshots/testing/1.5.png)
+
+### `1.6` — Risk assessments whose `Risk_Level` does not match `Risk_Thresholds`
+![1.6](screenshots/testing/1.6.png)
 
 ---
 
 ## 2. Clinical Relationship Verification Queries
 
-- **2.1 Patients with User details:** ![2.1](screenshots/testing/2.1.png)
-- **2.2 Appointments with Patient and Doctor details:** ![2.2](screenshots/testing/2.2.png)
-- **2.3 Distinct patient count by risk level:** ![2.3](screenshots/testing/2.3.png)
-- **2.4 High-risk assessments and linked notifications:** ![2.4](screenshots/testing/2.4.png)
-- **2.5 Patients with diagnoses:** ![2.5](screenshots/testing/2.5.png)
-- **2.6 Lab results with test reference ranges:** ![2.6](screenshots/testing/2.6.png)
-- **2.7 Prescriptions with medication names:** ![2.7](screenshots/testing/2.7.png)
-- **2.8 Treatments with treatment names:** ![2.8](screenshots/testing/2.8.png)
+### `2.1` — Patients with User details
+![2.1](screenshots/testing/2.1.png)
+
+### `2.2` — Appointments with Patient and Doctor details
+![2.2](screenshots/testing/2.2.png)
+
+### `2.3` — Distinct patient count by risk level
+![2.3](screenshots/testing/2.3.png)
+
+### `2.4` — High-risk assessments and linked notifications
+![2.4](screenshots/testing/2.4.png)
+
+### `2.5` — Patients with diagnoses
+![2.5](screenshots/testing/2.5.png)
+
+### `2.6` — Lab results with test reference ranges
+![2.6](screenshots/testing/2.6.png)
+
+### `2.7` — Prescriptions with medication names
+![2.7](screenshots/testing/2.7.png)
+
+### `2.8` — Treatments with treatment names
+![2.8](screenshots/testing/2.8.png)
 
 ---
 
