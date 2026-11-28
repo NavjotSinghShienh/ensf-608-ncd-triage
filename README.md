@@ -68,10 +68,11 @@ This database operationalizes **United Nations Sustainable Development Goal 3: G
 ```text
 ensf-608-ncd-triage/
 ├── docs/
+│   ├── ENSF 608 Project Report - Group 6.pdf # Final project report summary
 │   ├── Normalization_Decisions.docx          # Detailed 1NF, 2NF, 3NF decisions & FD registry
 │   ├── Query_Execution_Results.md            # Executed DML & stored procedure query evidence
 │   ├── Testing_Results.md                    # Database constraint & positive DML test results (26/26 PASS)
-│   └── screenshots/                          # MySQL Workbench execution screenshots (DML & procedure)
+│   └── screenshots/                          # MySQL Workbench execution screenshots (DML, procedure & testing)
 ├── models/
 │   ├── Conceptual_Model.drawio               # Editable Draw.io EER Conceptual Model
 │   ├── Conceptual_Model_Image.png            # Exported Conceptual Model diagram (PNG)
@@ -369,20 +370,20 @@ The database is designed to answer core clinical and operational questions ident
 Per the **ENSF 608 Project Description**, the physical implementation and testing scripts in [`scripts/`](scripts/) are organized to fulfill all required project milestones:
 
 ### SQL Operations & Queries Coverage (Minimum 25 Distinct Operations)
-| Category | Minimum Required |
-| :--- | :---: |
-| `INSERT` operations | 2 |
-| `UPDATE` operations | 2 |
-| `DELETE` operations | 2 |
-| Basic `SELECT` queries with filtering (`WHERE`, `LIKE`, `IN`, `BETWEEN`, `AND`, `OR`) | 4 |
-| `SELECT` queries using `ORDER BY`, `DISTINCT`, or `LIMIT` | 2 |
-| `SELECT` queries using aggregate functions (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`) | 3 |
-| `SELECT` queries using `GROUP BY` (including at least one with `HAVING`) | 2 |
-| `SELECT` queries using `INNER JOIN` (including 3+ table joins) | 3 |
-| `SELECT` queries using `LEFT JOIN` or `RIGHT JOIN` | 2 |
-| Complex `SELECT` query combining `JOIN`s, aggregations, filtering, and grouping | 1 |
-| Executable `STORED PROCEDURE`s (including at least one with an input parameter) | 2 |
-| **Total Minimum Operations** | **25** |
+| Category | Minimum Required | Implemented | Script / IDs |
+| :--- | :---: | :---: | :--- |
+| `INSERT` operations | 2 | 2 | `scripts/DML.sql` (`I1`–`I2`) |
+| `UPDATE` operations | 2 | 2 | `scripts/DML.sql` (`U1`–`U2`) |
+| `DELETE` operations | 2 | 2 | `scripts/DML.sql` (`D1`–`D2`) |
+| Basic `SELECT` queries with filtering (`WHERE`, `LIKE`, `IN`, `BETWEEN`, `AND`, `OR`) | 4 | 4 | `scripts/DML.sql` (`S1`–`S4`) |
+| `SELECT` queries using `ORDER BY`, `DISTINCT`, or `LIMIT` | 2 | 2 | `scripts/DML.sql` (`O1`–`O2`) |
+| `SELECT` queries using aggregate functions (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`) | 3 | 3 | `scripts/DML.sql` (`A1`–`A3`) |
+| `SELECT` queries using `GROUP BY` (including at least one with `HAVING`) | 2 | 2 | `scripts/DML.sql` (`G1`–`G2`) |
+| `SELECT` queries using `INNER JOIN` (including 3+ table joins) | 3 | 3 | `scripts/DML.sql` (`J1`–`J3`) |
+| `SELECT` queries using `LEFT JOIN` or `RIGHT JOIN` | 2 | 2 | `scripts/DML.sql` (`L1`–`L2`) |
+| Complex `SELECT` query combining `JOIN`s, aggregations, filtering, and grouping | 1 | 7 | `scripts/DML.sql` (`C1`–`C7`) |
+| Executable `STORED PROCEDURE`s (including at least one with an input parameter) | 2 | 2 | `scripts/procedure.sql` (`P1`–`P2`) |
+| **Total Operations** | **25** | **31** | **Evidence in [`docs/Query_Execution_Results.md`](docs/Query_Execution_Results.md)** |
 
 ### Systematic Database Testing
 The database testing suite verifies:
@@ -394,7 +395,7 @@ The database testing suite verifies:
 ## 11. How to Create, Populate, and Use the Database
 
 ### Prerequisites
-- **MySQL Server 8.0+** (tested on MySQL 8.4) and **MySQL Workbench** (or the `mysql` CLI).
+- **MySQL Server 8.0+** (tested on MySQL 8.4) and **MySQL Workbench**.
 
 ### Execution Order
 Run the scripts in [`scripts/`](scripts/) in the following exact order:
@@ -413,12 +414,12 @@ Run the scripts in [`scripts/`](scripts/) in the following exact order:
 
 All four team members contributed across their assigned project roles (aligned with the approved Team Project Proposal and verified via Git commit history). In addition, **Conceptual Modelling and Logical Modelling were completed as a collaborative effort across the entire team**.
 
-| Participant Name | UCID | Team Role |
+| Participant Name | UCID | Team Role & Responsibilities |
 | :--- | :---: | :--- |
-| **Navjot Singh Shienh** | 30332849 | Project Management, Requirements gathering, Database Implementation |
-| **Iesrat Jahan Popy** | 30304908 | Conceptual Model, Data Population |
-| **Nikita Williams** | 30143759 | Logical Model, Normalization |
-| **Md Jubayer Khan** | 30336019 | Documentation, Database Testing |
+| **Navjot Singh Shienh** | `30332849` | Project Management, Requirements Gathering, Database Implementation |
+| **Iesrat Jahan Popy** | `30304908` | Conceptual Model, Data Population |
+| **Nikita Williams** | `30143759` | Logical Model, Normalization |
+| **Md Jubayer Khan** | `30336019` | Documentation, Database Testing |
 
 ---
 
